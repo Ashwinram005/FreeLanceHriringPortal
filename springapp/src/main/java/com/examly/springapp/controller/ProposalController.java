@@ -3,6 +3,9 @@ package com.examly.springapp.controller;
 import com.examly.springapp.model.Proposal;
 import com.examly.springapp.service.ProposalService;
 import jakarta.validation.Valid;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -18,5 +21,10 @@ public class ProposalController {
     public ResponseEntity<Proposal> submitProposal(@Valid @RequestBody Proposal proposal) {
         Proposal saved = proposalService.submitProposal(proposal);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public List<Proposal> getAllProposal(){
+        return proposalService.getAllProposal();
     }
 }

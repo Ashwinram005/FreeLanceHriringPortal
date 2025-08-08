@@ -1,5 +1,7 @@
 package com.examly.springapp.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +18,7 @@ public class ProposalService {
     private ProjectRepository projectrepository;
 
     @Autowired
-    private ProposalRepository proposalrespository;
+    private ProposalRepository proposalrepository;
 
     public Proposal submitProposal(Proposal proposal) {
 
@@ -28,10 +30,13 @@ public class ProposalService {
             throw new ResourceNotFoundException("Project not found with ID: "+proposal.getProjectId());
         }
 
-        boolean exists=proposalrespository.existsByProjectIdAndFreelancerId(proposal.getProjectId(),proposal.getFreelancerId());
+        boolean exists=proposalrepository.existsByProjectIdAndFreelancerId(proposal.getProjectId(),proposal.getFreelancerId());
         if(exists)
         throw new ConflictException("You have already submitted a proposal for this project");
-        return proposalrespository.save(proposal);
+        return proposalrepository.save(proposal);
     }
 
+    public List<Proposal> getAllProposal(){
+        return proposalrepository.findAll();
+    }
 }

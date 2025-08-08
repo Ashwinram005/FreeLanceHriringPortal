@@ -8,7 +8,7 @@ import lombok.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Data 
 public class Contract {
 
     @Id

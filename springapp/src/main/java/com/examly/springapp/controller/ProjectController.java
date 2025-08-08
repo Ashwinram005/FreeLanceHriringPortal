@@ -3,6 +3,9 @@ package com.examly.springapp.controller;
 import com.examly.springapp.model.Project;
 import com.examly.springapp.service.ProjectService;
 import jakarta.validation.Valid;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -22,5 +25,9 @@ public class ProjectController {
     @GetMapping("/{id}")
     public ResponseEntity<Project> getById(@PathVariable Long id) {
         return ResponseEntity.ok(projectService.getById(id));
+    }
+    @GetMapping()
+    public List<Project> getAllProjects(){
+        return projectService.getAllProjects();
     }
 }
