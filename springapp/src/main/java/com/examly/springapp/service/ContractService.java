@@ -34,4 +34,11 @@ public class ContractService {
     public List<Contract> getAllContract(){
         return contractRepo.findAll();
     }
+
+    public Contract updateDate(Contract contract,Long id){
+        return contractRepo.findById(id).map(old -> {
+            old.setStartDate(contract.getStartDate());
+            return contractRepo.save(old);
+        }).orElseThrow(() -> new ResourceNotFoundException("Id not found"));
+    }
 }

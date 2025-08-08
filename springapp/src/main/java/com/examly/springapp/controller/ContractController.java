@@ -27,4 +27,10 @@ public class ContractController {
     public List<Contract> getAllContract(){
         return contractService.getAllContract();
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Contract> updateDate(@RequestBody Contract contract,@PathVariable Long id){
+        Contract upd= contractService.updateDate(contract, id);
+        return ResponseEntity.ok(upd);
+    }
 }
