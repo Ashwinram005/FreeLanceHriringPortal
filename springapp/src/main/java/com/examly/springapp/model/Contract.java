@@ -1,28 +1,30 @@
 package com.examly.springapp.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import java.util.Date;
 import lombok.*;
 
 @Entity
-@NoArgsConstructor
+@Table(name = "contracts")
+@Data
 @AllArgsConstructor
-@Data 
+@NoArgsConstructor
 public class Contract {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    private Long proposalId;
+    @ManyToOne
+    @JoinColumn(name = "proposal_id", nullable = false)
+    private Proposal proposal;
 
-    @Future
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
-    @NotBlank
-    private String paymentTerms;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
+    public enum Status {
+        PENDING, COMPLETED
+    }
 }

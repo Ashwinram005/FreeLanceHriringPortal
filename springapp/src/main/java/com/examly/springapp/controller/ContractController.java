@@ -1,36 +1,60 @@
 package com.examly.springapp.controller;
 
-import com.examly.springapp.model.Contract;
+import com.examly.springapp.dto.ContractDTO;
 import com.examly.springapp.service.ContractService;
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-
 @RestController
-@RequestMapping("/api/contracts")
+@RequestMapping("/contracts")
+@CrossOrigin(origins = "*")
 public class ContractController {
 
-    @Autowired
-    private ContractService contractService;
+    private final ContractService contractService;
+
+    public ContractController(ContractService contractService) {
+        this.contractService = contractService;
+    }
 
     @PostMapping
-    public ResponseEntity<Contract> create(@Valid @RequestBody Contract contract) {
-        Contract saved = contractService.createContract(contract);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    public ContractDTO createContract(@RequestBody ContractDTO dto) {
+        return contractService.createContract(dto);
     }
 
     @GetMapping
-    public List<Contract> getAllContract(){
-        return contractService.getAllContract();
+    public List<ContractDTO> getAllContracts() {
+        return contractService.getAllContracts();
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Contract> updateDate(@RequestBody Contract contract,@PathVariable Long id){
-        Contract upd= contractService.updateDate(contract, id);
-        return ResponseEntity.ok(upd);
+    @GetMapping("/{id}")
+    public ContractDTO getContractById(@PathVariable Long id) {
+        return contractService.getContractById(id);
     }
+
+    @PutMapping("/{id}")
+    public ContractDTO updateContract(@PathVariable Long id, @RequestBody ContractDTO dto) {
+        return contractService.updateContract(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteContract(@PathVariable Long id) {
+        contractService.deleteContract(id);
+    }
+
+    @GetMapping("/client/{clientId}")
+    public List<ContractDTO> getByClientId(@PathVariable Long clientId) {
+        return contractService.getByClientId(clientId);
+    }
+
+    @GetMapping("/freelancer/{freelancerId}")
+    public List<ContractDTO> getByFreelancerId(@PathVariable Long freelancerId) {
+        return contractService.getByFreelancerId(freelancerId);
+    }
+
+    @GetMapping("/project/{projectId}")
+    public ContractDTO getByProjectId(@PathVariable Long projectId) {
+        return contractService.getByProjectId(projectId);
+    }
+
 }
