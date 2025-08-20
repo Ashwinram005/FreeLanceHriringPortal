@@ -40,7 +40,8 @@ export default function Contracts() {
   // Delete contract
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this contract?")) return;
-
+    console.log("Deleting contract with ID:", id)
+    console.log("Token:", token)
     try {
       await axios.delete(`http://localhost:8080/contracts/${id}`, {
         headers: { Authorization: `Bearer ${token}` },

@@ -66,7 +66,7 @@ function App() {
 
           <Route path="/dashboard" element={token && hasAccess(["CLIENT", "ADMIN"]) ? <Dashboard /> : <Navigate to="/login" />} />
           <Route path="/post-project" element={token && hasAccess(["CLIENT", "ADMIN"]) ? <PostProject /> : <Navigate to="/login" />} />
-          <Route path="/browse-projects" element={token && hasAccess(["FREELANCER", "ADMIN"]) ? <BrowseProjects /> : <Navigate to="/login" />} />
+          <Route path="/browse-projects" element={token && hasAccess(["FREELANCER"]) ? <BrowseProjects /> : <Navigate to="/login" />} />
           <Route path="/freelancer-dashboard" element={token && hasAccess(["FREELANCER", "ADMIN"]) ? <FreelancerDashboard /> : <Navigate to="/login" />} />
           <Route path="/manage-users" element={token && hasAccess(["ADMIN"]) ? <ManageUsers /> : <Navigate to="/login" />} />
           <Route path="/view-contracts" element={token && hasAccess(["ADMIN"]) ? <ViewContracts /> : <Navigate to="/login" />} />

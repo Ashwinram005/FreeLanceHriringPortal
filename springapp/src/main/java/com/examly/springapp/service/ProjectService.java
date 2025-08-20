@@ -25,7 +25,7 @@ public class ProjectService {
         User client = userRepository.findById(dto.getClientId())
             .orElseThrow(() -> new IllegalArgumentException("Client not found"));
 
-        if (client.getRole() != User.Role.CLIENT) {
+        if (client.getRole() != User.Role.CLIENT&&client.getRole() != User.Role.ADMIN) {
             throw new IllegalArgumentException("User is not a client");
         }
 

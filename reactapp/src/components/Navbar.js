@@ -1,9 +1,10 @@
 // src/components/Navbar.js
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const role = (localStorage.getItem("role") || "").toUpperCase();
 
   const logout = () => {
@@ -14,106 +15,83 @@ export default function Navbar() {
   };
 
   const navStyle = {
-    background: "linear-gradient(90deg, #1f2937 0%, #1a1f2b 100%)",
-    padding: "10px 25px",
-    color: "#fff",
+    background: "rgba(255, 255, 255, 0.75)",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+    borderBottom: "1px solid rgba(0,0,0,0.08)",
+    padding: "12px 28px",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-    borderBottom: "2px solid #111827",
-    transition: "all 0.3s ease",
+    position: "sticky",
+    top: 0,
+    zIndex: 100,
+    fontFamily: "'Inter', sans-serif",
   };
 
   const linkContainerStyle = {
     display: "flex",
     alignItems: "center",
-    gap: "16px",
+    gap: "22px",
   };
 
-  const linkStyle = {
-    color: "#f1f5f9",
+  const linkStyle = (path) => ({
     textDecoration: "none",
-    padding: "7px 14px",
-    borderRadius: "6px",
-    fontWeight: "500",
+    fontWeight: "600",
+    fontSize: "15px",
+    color: location.pathname === path ? "#2563eb" : "#111827",
+    paddingBottom: "4px",
+    borderBottom:
+      location.pathname === path ? "2px solid #2563eb" : "2px solid transparent",
     transition: "all 0.25s ease",
-    background: "transparent",
-    transform: "scale(1)",
-  };
+  });
 
   const logoutButtonStyle = {
-    background: "#ef4444",
+    background: "#2563eb",
     color: "#fff",
     border: "none",
-    padding: "7px 16px",
-    borderRadius: "6px",
+    padding: "8px 18px",
+    borderRadius: "50px",
     cursor: "pointer",
-    fontWeight: "500",
+    fontWeight: "600",
+    fontSize: "14px",
     transition: "all 0.25s ease",
-  };
-
-  const handleMouseOver = (e) => {
-    e.currentTarget.style.background = "#3b82f6";
-    e.currentTarget.style.boxShadow = "0 2px 10px rgba(59,130,246,0.5)";
-    e.currentTarget.style.transform = "scale(1.05)";
-  };
-
-  const handleMouseOut = (e) => {
-    e.currentTarget.style.background = "transparent";
-    e.currentTarget.style.boxShadow = "none";
-    e.currentTarget.style.transform = "scale(1)";
   };
 
   return (
     <nav style={navStyle}>
+      <div style={{ fontWeight: "800", fontSize: "18px", color: "#111827" }}>
+        Freelance<span style={{ color: "#2563eb" }}>Hub</span>
+      </div>
+
       <div style={linkContainerStyle}>
         {role === "ADMIN" && (
           <>
-            <Link
-              to="/manage-users"
-              style={linkStyle}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
-            >
-              Admin Dashboard
+            <Link to="/manage-users" style={linkStyle("/manage-users")}>
+              Manage Users
             </Link>
-            <Link
-              to="/view-contracts"
-              style={linkStyle}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
-            >
-              View Contracts
+            <Link to="/view-contracts" style={linkStyle("/view-contracts")}>
+              Contracts
             </Link>
+            <Link to="/dashboard" style={linkStyle("/dashboard")}>
+              Client Dashboard
+            </Link>
+            <Link to="/post-project" style={linkStyle("/post-project")}>
+              Post Project
+            </Link>
+           
           </>
         )}
 
         {role === "CLIENT" && (
           <>
-            <Link
-              to="/dashboard"
-              style={linkStyle}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
-            >
-              Client Dashboard
+            <Link to="/dashboard" style={linkStyle("/dashboard")}>
+              Dashboard
             </Link>
-            <Link
-              to="/post-project"
-              style={linkStyle}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
-            >
+            <Link to="/post-project" style={linkStyle("/post-project")}>
               Post Project
             </Link>
-            <Link
-              to="/contracts"
-              style={linkStyle}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
-            >
+            <Link to="/contracts" style={linkStyle("/contracts")}>
               Contracts
             </Link>
           </>
@@ -123,37 +101,20 @@ export default function Navbar() {
           <>
             <Link
               to="/freelancer-dashboard"
-              style={linkStyle}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
+              style={linkStyle("/freelancer-dashboard")}
             >
-              Freelancer Dashboard
+              Dashboard
             </Link>
-            <Link
-              to="/browse-projects"
-              style={linkStyle}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
-            >
-              Browse Projects
+            <Link to="/browse-projects" style={linkStyle("/browse-projects")}>
+              Browse
             </Link>
-            <Link
-              to="/contracts"
-              style={linkStyle}
-              onMouseOver={handleMouseOver}
-              onMouseOut={handleMouseOut}
-            >
+            <Link to="/contracts" style={linkStyle("/contracts")}>
               Contracts
             </Link>
           </>
         )}
 
-        <Link
-          to="/profile"
-          style={linkStyle}
-          onMouseOver={handleMouseOver}
-          onMouseOut={handleMouseOut}
-        >
+        <Link to="/profile" style={linkStyle("/profile")}>
           Profile
         </Link>
       </div>
@@ -161,8 +122,8 @@ export default function Navbar() {
       <button
         onClick={logout}
         style={logoutButtonStyle}
-        onMouseOver={(e) => (e.currentTarget.style.background = "#dc2626")}
-        onMouseOut={(e) => (e.currentTarget.style.background = "#ef4444")}
+        onMouseOver={(e) => (e.currentTarget.style.background = "#1d4ed8")}
+        onMouseOut={(e) => (e.currentTarget.style.background = "#2563eb")}
       >
         Logout
       </button>

@@ -17,6 +17,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!clientId || !token) {
+      
       setError("Client not logged in!");
       setLoading(false);
       return;

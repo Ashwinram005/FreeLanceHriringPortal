@@ -16,6 +16,7 @@ export default function FreelancerDashboard() {
 
   useEffect(() => {
     if (!token) {
+      navigate("/login");
       setError("You are not logged in!");
       setLoading(false);
       return;

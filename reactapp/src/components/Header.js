@@ -2,60 +2,44 @@
 import React from "react";
 
 export default function Header() {
-  const headerStyle = {
-    background: "linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)",
+  const headerWrapper = {
+    background: "linear-gradient(135deg, #2563eb, #06b6d4)",
     color: "#fff",
-    padding: "15px 15px",          // reduced padding
+    padding: "60px 20px",
     textAlign: "center",
-    fontSize: "20px",              // smaller font
-    fontWeight: "700",
-    boxShadow: "0 3px 8px rgba(0, 0, 0, 0.25)", // lighter shadow
-    borderBottomLeftRadius: "10px",
-    borderBottomRightRadius: "10px",
+    fontFamily: "'Inter', sans-serif",
     position: "relative",
     overflow: "hidden",
-    animation: "slideDown 0.8s ease-out",
+    borderBottomLeftRadius: "30px",
+    borderBottomRightRadius: "30px",
+  };
+
+  const titleStyle = {
+    fontSize: "36px",
+    fontWeight: "800",
+    marginBottom: "10px",
   };
 
   const subTextStyle = {
-    fontSize: "14px",              // smaller subtext
-    fontWeight: "400",
-    marginTop: "4px",
-    fontStyle: "italic",
-    color: "#f0f0f0",
-    opacity: 0,
-    animation: "fadeIn 1s 0.5s forwards",
+    fontSize: "18px",
+    fontWeight: "500",
+    marginBottom: "6px",
+    color: "rgba(255,255,255,0.9)",
   };
 
   const taglineStyle = {
-    fontSize: "12px",              // smaller tagline
-    marginTop: "3px",
-    color: "#d1d5db",
-    fontStyle: "normal",
-    opacity: 0,
-    animation: "fadeIn 1s 1s forwards",
+    fontSize: "15px",
+    color: "rgba(255,255,255,0.85)",
+    marginTop: "8px",
   };
 
   return (
-    <header style={headerStyle}>
-      My Freelance Platform
-      <div style={subTextStyle}>Where projects meet talent!</div>
+    <header style={headerWrapper}>
+      <div style={titleStyle}>✨ FreelanceHub</div>
+      <div style={subTextStyle}>Where Projects Meet Talent</div>
       <div style={taglineStyle}>
-        Discover opportunities and grow your career.
+        Post, Browse, and Collaborate — all in one platform.
       </div>
-
-      {/* Keyframes for animations */}
-      <style>
-        {`
-          @keyframes slideDown {
-            0% { transform: translateY(-40px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-          }
-          @keyframes fadeIn {
-            to { opacity: 1; }
-          }
-        `}
-      </style>
     </header>
   );
 }
