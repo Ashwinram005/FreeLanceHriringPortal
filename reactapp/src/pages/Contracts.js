@@ -1,34 +1,43 @@
+// src/pages/ViewContracts.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { FaTrash, FaFileContract, FaSort } from "react-icons/fa";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Contracts() {
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [sortOption, setSortOption] = useState("COMPLETED_FIRST"); 
+  const [sortOption, setSortOption] = useState("COMPLETED_FIRST");
   const [currentPage, setCurrentPage] = useState(1);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedContract, setSelectedContract] = useState(null);
+
   const pageSize = 3;
   const token = localStorage.getItem("token");
   const role = (localStorage.getItem("role") || "").toUpperCase();
   const userId = localStorage.getItem("userId");
 
+  // Fetch contracts
   useEffect(() => {
     const fetchContracts = async () => {
       try {
-        let url = "";
-        if (role === "CLIENT")
-          url = `http://localhost:8080/contracts/client/${userId}`;
-        if (role === "FREELANCER")
-          url = `http://localhost:8080/contracts/freelancer/${userId}`;
+        setLoading(true);
+        setError("");
+
+        let url =
+          role === "CLIENT"
+            ? `http://localhost:8080/contracts/client/${userId}`
+            : `http://localhost:8080/contracts/freelancer/${userId}`;
 
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
+        console.log(response.data);
         setContracts(response.data);
       } catch (err) {
         console.error(err.response || err);
-        setError("Failed to fetch contracts");
+        setError("Failed to fetch contracts. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -39,29 +48,27 @@ export default function Contracts() {
 
   // Delete contract
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this contract?")) return;
-    console.log("Deleting contract with ID:", id)
-    console.log("Token:", token)
     try {
       await axios.delete(`http://localhost:8080/contracts/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // Remove deleted contract from state
-      setContracts(prev => prev.filter(contract => contract.id !== id));
+      setContracts((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Contract deleted successfully!");
     } catch (err) {
       console.error(err.response || err);
-      alert("Failed to delete contract");
+      toast.error("Failed to delete contract. Try again.");
+    } finally {
+      setModalOpen(false);
+      setSelectedContract(null);
     }
   };
 
-  // Sorting contracts
+  // Sort contracts
   const sortedContracts = [...contracts].sort((a, b) => {
-    let order;
-    if (sortOption === "COMPLETED_FIRST") {
-      order = { COMPLETED: 0, PENDING: 1 };
-    } else {
-      order = { PENDING: 0, COMPLETED: 1 };
-    }
+    const order =
+      sortOption === "COMPLETED_FIRST"
+        ? { COMPLETED: 0, PENDING: 1 }
+        : { PENDING: 0, COMPLETED: 1 };
     return order[a.status] - order[b.status];
   });
 
@@ -73,128 +80,159 @@ export default function Contracts() {
   );
 
   if (loading)
-    return <p style={{ textAlign: "center", marginTop: "40px" }}>Loading contracts...</p>;
-  if (error)
-    return <p style={{ color: "red", textAlign: "center", marginTop: "40px" }}>{error}</p>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-gray-500 text-lg animate-pulse">
+          Loading contracts...
+        </p>
+      </div>
+    );
 
   return (
-    <div
-      style={{
-        maxWidth: "700px",
-        margin: "40px auto",
-        padding: "30px",
-        backgroundColor: "#f9f9f9",
-        borderRadius: "12px",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      }}
-    >
-      <h2 style={{ textAlign: "center", marginBottom: "25px", color: "#333" }}>Contracts</h2>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
+      <Toaster position="top-right" />
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <h2 className="text-3xl font-bold text-gray-900 text-center mb-6 flex items-center justify-center gap-2">
+          <FaFileContract className="text-blue-500" /> Contracts
+        </h2>
 
-      {/* Sorting dropdown */}
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <label htmlFor="sort" style={{ marginRight: "10px" }}>Sort by Status:</label>
-        <select
-          id="sort"
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
-          style={{ padding: "6px 10px", borderRadius: "4px" }}
-        >
-          <option value="COMPLETED_FIRST">Completed First</option>
-          <option value="PENDING_FIRST">Pending First</option>
-        </select>
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6 text-center font-medium">
+            {error}
+          </div>
+        )}
+
+        {/* Sorting */}
+        <div className="flex justify-center items-center mb-6 gap-2">
+          <FaSort className="text-gray-600" />
+          <label htmlFor="sort" className="text-gray-700 font-medium">
+            Sort by status:
+          </label>
+          <select
+            id="sort"
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="COMPLETED_FIRST">Completed First</option>
+            <option value="PENDING_FIRST">Pending First</option>
+          </select>
+        </div>
+
+        {/* Contract List */}
+        {/* Contract List */}
+        {displayedContracts.length === 0 ? (
+          <p className="text-center text-gray-500">
+            No approved projects/contracts yet.
+          </p>
+        ) : (
+          <div className="grid gap-6">
+            {displayedContracts.map((contract) => (
+              <div
+                key={contract.id}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white rounded-2xl shadow hover:shadow-lg transition-shadow duration-300"
+              >
+                <div className="space-y-1">
+                  <p className="text-gray-800 font-semibold">
+                    Contract ID:{" "}
+                    <span className="font-normal text-gray-600">
+                      {contract.id}
+                    </span>
+                  </p>
+                  <p className="text-gray-800 font-semibold">
+                    Project ID:{" "}
+                    <span className="font-normal text-gray-600">
+                      {contract.proposalId}
+                    </span>
+                  </p>
+                  <p className="text-gray-800 font-semibold">
+                    Description:{" "}
+                    <span className="font-normal text-gray-600">
+                      {contract.description}
+                    </span>
+                  </p>
+                  <p className="text-gray-800 font-semibold">
+                    Status:{" "}
+                    <span
+                      className={`font-medium ${
+                        contract.status === "COMPLETED"
+                          ? "text-green-600"
+                          : "text-yellow-500"
+                      }`}
+                    >
+                      {contract.status}
+                    </span>
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedContract(contract);
+                    setModalOpen(true);
+                  }}
+                  className="flex items-center gap-1 mt-4 sm:mt-0 px-4 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  <FaTrash /> Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-6 gap-3">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-lg border border-blue-500 text-blue-500 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="text-gray-700 font-medium">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-lg border border-blue-500 text-blue-500 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
-      {displayedContracts.length === 0 ? (
-        <p style={{ textAlign: "center", color: "#666" }}>No approved projects/contracts yet.</p>
-      ) : (
-        <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "15px" }}>
-          {displayedContracts.map((contract) => (
-            <li
-              key={contract.id}
-              style={{
-                padding: "15px 20px",
-                borderRadius: "10px",
-                backgroundColor: "#fff",
-                border: "1px solid #ddd",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                transition: "transform 0.2s, box-shadow 0.2s",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = "translateY(-3px)";
-                e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.1)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
-              }}
-            >
-              <div>
-                <p style={{ margin: "5px 0", fontWeight: "bold", color: "#444" }}>
-                  Project ID: <span style={{ fontWeight: "normal", color: "#666" }}>{contract.proposalId}</span>
-                </p>
-                <p style={{ margin: "5px 0", fontWeight: "bold", color: "#444" }}>
-                  Status:{" "}
-                  <span style={{ fontWeight: "normal", color: contract.status === "COMPLETED" ? "#28a745" : "#ffc107" }}>
-                    {contract.status}
-                  </span>
-                </p>
-              </div>
-              {/* Delete Button */}
+      {/* Delete Confirmation Modal */}
+      {modalOpen && selectedContract && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full text-center">
+            <h3 className="text-lg font-bold mb-4">Delete Contract</h3>
+            <p className="mb-6">
+              Are you sure you want to delete project ID{" "}
+              <strong>{selectedContract.proposalId}</strong>?
+            </p>
+            <div className="flex justify-center gap-4">
               <button
-                onClick={() => handleDelete(contract.id)}
-                style={{
-                  padding: "6px 12px",
-                  borderRadius: "5px",
-                  border: "none",
-                  backgroundColor: "#dc3545",
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
+                onClick={() => handleDelete(selectedContract.id)}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors"
               >
-                Delete
+                Yes, Delete
               </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {totalPages > 1 && (
-        <div style={{ textAlign: "center", marginTop: "20px" }}>
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            style={{
-              padding: "6px 12px",
-              marginRight: "10px",
-              borderRadius: "5px",
-              border: "1px solid #007bff",
-              backgroundColor: "#fff",
-              color: "#007bff",
-              cursor: "pointer",
-            }}
-          >
-            Previous
-          </button>
-          <span>Page {currentPage} of {totalPages}</span>
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            style={{
-              padding: "6px 12px",
-              marginLeft: "10px",
-              borderRadius: "5px",
-              border: "1px solid #007bff",
-              backgroundColor: "#fff",
-              color: "#007bff",
-              cursor: "pointer",
-            }}
-          >
-            Next
-          </button>
+              <button
+                onClick={() => {
+                  setModalOpen(false);
+                  setSelectedContract(null);
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

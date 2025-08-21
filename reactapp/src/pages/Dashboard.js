@@ -226,7 +226,7 @@
                     onClick={() => viewMoreDetails(project.id)}
                     className="px-4 py-2 bg-gray-700 text-white rounded-lg shadow hover:bg-gray-800 transition"
                   >
-                    View More Details
+                    Milestones
                   </button>
                 </div>
               </li>

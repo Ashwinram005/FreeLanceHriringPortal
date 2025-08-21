@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../api";
 import { validateEmail, validatePassword } from "../utils";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -11,28 +12,27 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("CLIENT");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError("");
 
     if (!validateEmail(email) || !validatePassword(password)) {
-      setError("Please enter a valid email and password (min 6 characters).");
+      toast.error(
+        "Please enter a valid email and password (min 6 characters)."
+      );
       return;
     }
 
     try {
       setLoading(true);
       await registerUser({ name, email, password, role });
-      alert("🎉 Registration successful! Please login.");
-      navigate("/login");
+      toast.success("🎉 Registration successful! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      if (err.response && err.response.data) {
-        setError(err.response.data.message || "Registration failed.");
-      } else {
-        setError("Server not reachable.");
-      }
+      const msg =
+        err.response?.data?.message ||
+        "Server not reachable. Registration failed.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,9 @@ export default function Register() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Left Branding Section (same as Login) */}
+      <Toaster position="top-right" />
+
+      {/* Left Branding Section */}
       <div className="hidden lg:flex flex-col justify-center items-center bg-gradient-to-br from-indigo-700 via-blue-700 to-cyan-600 text-white p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
         <div className="relative z-10 max-w-md text-center animate-fadeIn">
@@ -51,9 +53,9 @@ export default function Register() {
             🌟 Start Your Journey Today
           </p>
           <p className="text-white/90 leading-relaxed">
-            Create your account and explore opportunities as a client or freelancer.
+            Create your account and explore opportunities as a client or
+            freelancer.
           </p>
-          {/* Illustration */}
           <img
             src="https://illustrations.popsy.co/gray/remote-work.svg"
             alt="Register illustration"
@@ -72,12 +74,6 @@ export default function Register() {
             Create Account
           </h2>
           <p className="text-gray-500 mb-6">Sign up to get started 🚀</p>
-
-          {error && (
-            <p className="text-red-500 text-sm mb-3 bg-red-50 px-3 py-2 rounded-md border border-red-200">
-              {error}
-            </p>
-          )}
 
           <div className="mb-4">
             <label className="block text-left text-sm font-medium text-gray-700 mb-1">
@@ -132,6 +128,7 @@ export default function Register() {
             >
               <option value="CLIENT">Client</option>
               <option value="FREELANCER">Freelancer</option>
+              <option value="ADMIN">Admin</option>
             </select>
           </div>
 

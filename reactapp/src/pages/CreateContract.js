@@ -1,10 +1,15 @@
+// src/pages/CreateContract.js
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
+import { FaCheckCircle } from "react-icons/fa";
 
 export default function CreateContract() {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("PENDING");
+  const [submitting, setSubmitting] = useState(false);
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -13,115 +18,77 @@ export default function CreateContract() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!description) return toast.error("Please enter a description.");
+    setSubmitting(true);
     try {
       await axios.post(
         "http://localhost:8080/contracts",
         { proposalId, description, status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("Contract created successfully!");
-      navigate("/freelancer/dashboard");
+      toast.success("Contract created successfully!");
+      setTimeout(() => navigate("/freelancer/dashboard"), 1500);
     } catch (err) {
       console.error(err);
-      alert("Failed to create contract.");
+      toast.error(err.response?.data?.message || "Failed to create contract.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "600px",
-        margin: "40px auto",
-        padding: "30px",
-        backgroundColor: "#f4f6f8",
-        borderRadius: "12px",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      }}
-    >
-      <h2
-        style={{
-          textAlign: "center",
-          marginBottom: "25px",
-          color: "#333",
-        }}
-      >
-        Create Contract
-      </h2>
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-      >
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <label
-            style={{
-              marginBottom: "8px",
-              fontWeight: "bold",
-              color: "#555",
-            }}
-          >
-            Description:
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            rows={5}
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              fontSize: "16px",
-              resize: "vertical",
-            }}
-          />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100 p-6">
+      <Toaster position="top-right" />
+
+      <div className="bg-white shadow-2xl rounded-3xl w-full max-w-lg p-10 flex flex-col gap-6">
+        {/* Header */}
+        <div className="flex flex-col items-center mb-6">
+          <FaCheckCircle className="text-5xl text-green-500 mb-2" />
+          <h2 className="text-3xl font-extrabold text-gray-800">Create Contract</h2>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <label
-            style={{
-              marginBottom: "8px",
-              fontWeight: "bold",
-              color: "#555",
-            }}
-          >
-            Status:
-          </label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            style={{
-              padding: "10px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
-              fontSize: "16px",
-              backgroundColor: "#fff",
-            }}
-          >
-            <option value="PENDING">Pending</option>
-            <option value="COMPLETED">Completed</option>
-          </select>
-        </div>
+        {/* Form */}
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+          {/* Description */}
+          <div className="flex flex-col">
+            <label className="font-semibold text-gray-700 mb-2">Description:</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              rows={5}
+              className="p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 resize-none"
+              placeholder="Enter contract description here..."
+            />
+          </div>
 
-        <button
-          type="submit"
-          style={{
-            padding: "12px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#4CAF50",
-            color: "#fff",
-            fontSize: "16px",
-            fontWeight: "bold",
-            cursor: "pointer",
-            transition: "background 0.3s",
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#45a049")}
-          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#4CAF50")}
-        >
-          Submit
-        </button>
-      </form>
+          {/* Status */}
+          <div className="flex flex-col">
+            <label className="font-semibold text-gray-700 mb-2">Status:</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-800 bg-white"
+            >
+              <option value="PENDING">Pending</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={submitting}
+            className={`p-4 rounded-xl font-bold text-white transition-colors ${
+              submitting
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+          >
+            {submitting ? "Submitting..." : "Submit Contract"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,8 @@
+// src/components/Milestones.js
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function Milestones() {
   const { projectId } = useParams();
@@ -49,7 +51,11 @@ export default function Milestones() {
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       )
-      .catch((err) => console.error(err));
+      .then(() => toast.success("Contract status updated"))
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to update contract status");
+      });
   };
 
   const handleMilestoneStatusChange = (milestoneId, newStatus) => {
@@ -65,14 +71,18 @@ export default function Milestones() {
             m.id === milestoneId ? { ...m, status: newStatus } : m
           )
         );
+        toast.success("Milestone status updated");
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to update milestone status");
+      });
   };
 
   const handleAddMilestone = (e) => {
     e.preventDefault();
     if (!contractId) {
-      alert("No contract found for this project. Cannot add milestone.");
+      toast.error("No contract found for this project. Cannot add milestone.");
       return;
     }
     axios
@@ -86,21 +96,28 @@ export default function Milestones() {
         setDescription("");
         setStatus("PENDING");
         setShowForm(false);
+        toast.success("Milestone added successfully");
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to add milestone");
+      });
   };
 
   const handleDeleteMilestone = (id) => {
-    if (!window.confirm("Are you sure you want to delete this milestone?"))
-      return;
+    if (!window.confirm("Are you sure you want to delete this milestone?")) return;
     axios
       .delete(`http://localhost:8080/milestones/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
         setMilestones((prev) => prev.filter((m) => m.id !== id));
+        toast.success("Milestone deleted");
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to delete milestone");
+      });
   };
 
   const handleDeleteFile = (milestoneId) => {
@@ -112,138 +129,128 @@ export default function Milestones() {
         setMilestones((prev) =>
           prev.map((m) => (m.id === milestoneId ? { ...m, fileName: null } : m))
         );
+        toast.success("File deleted successfully");
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to delete file");
+      });
   };
 
-  const completedCount = milestones.filter(m => m.status === "COMPLETED").length;
-  const completionPercent = milestones.length ? (completedCount / milestones.length) * 100 : 0;
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-10 px-5">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h2 className="text-4xl font-bold text-slate-800 mb-2">📌 Project Milestones</h2>
-          <p className="text-slate-600">Track progress and manage all project milestones efficiently.</p>
+    <div className="max-w-4xl mx-auto px-6 py-10">
+      <Toaster position="top-right" reverseOrder={false} />
+      <h2 className="text-3xl font-bold text-slate-800 mb-8">
+        Milestones for Project <span className="text-blue-600">#{projectId}</span>
+      </h2>
 
-          {milestones.length > 0 && (
-            <div className="mt-4 bg-slate-200 rounded-full h-4 w-full overflow-hidden shadow-inner">
-              <div
-                className="h-4 bg-blue-600 rounded-full transition-all duration-500"
-                style={{ width: `${completionPercent}%` }}
-              ></div>
-            </div>
-          )}
-        </div>
-
-        {/* Contract Status */}
-        {contractStatus && (
-          <div className="mb-6 bg-white shadow-md p-4 rounded-xl flex items-center gap-4">
-            <label className="font-semibold text-slate-700">Contract Status:</label>
-            <select
-              value={contractStatus}
-              onChange={(e) => handleContractStatusChange(e.target.value)}
-              className="px-4 py-2 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
-            >
-              <option value="PENDING">Pending</option>
-              <option value="COMPLETED">Completed</option>
-            </select>
-          </div>
-        )}
-
-        {/* Add Milestone Button */}
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className={`mb-6 px-6 py-2 font-medium rounded-lg shadow-md transition 
-            ${showForm ? "bg-red-500 hover:bg-red-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
-        >
-          {showForm ? "Cancel" : "➕ Add Milestone"}
-        </button>
-
-        {/* Add Milestone Form */}
-        {showForm && (
-          <form
-            onSubmit={handleAddMilestone}
-            className="mb-8 bg-white shadow-xl rounded-2xl p-6 space-y-4"
+      {contractStatus && (
+        <div className="mb-6 flex items-center gap-4">
+          <label className="font-medium text-slate-700">Contract Status:</label>
+          <select
+            value={contractStatus}
+            onChange={(e) => handleContractStatusChange(e.target.value)}
+            className="px-3 py-2 border rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
           >
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-              placeholder="Enter milestone description..."
-              className="w-full min-h-[100px] px-4 py-3 border rounded-xl shadow-sm focus:ring focus:ring-blue-300 resize-none"
-            />
-            <select
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="px-4 py-2 border rounded-xl shadow-sm focus:ring focus:ring-blue-300"
+            <option value="PENDING">Pending</option>
+            <option value="COMPLETED">Completed</option>
+          </select>
+        </div>
+      )}
+
+      <button
+        onClick={() => setShowForm(!showForm)}
+        className="mb-6 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium px-5 py-2 rounded-lg shadow hover:from-blue-700 hover:to-blue-600 transition"
+      >
+        {showForm ? "Cancel" : "➕ Add Milestone"}
+      </button>
+
+      {showForm && (
+        <form
+          onSubmit={handleAddMilestone}
+          className="bg-white p-6 rounded-xl shadow-lg mb-8 space-y-4 border"
+        >
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            placeholder="Milestone description..."
+            className="w-full min-h-[80px] p-3 border rounded-lg focus:ring focus:ring-blue-200 focus:outline-none resize-y"
+          />
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="px-3 py-2 border rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
+          >
+            <option value="PENDING">Pending</option>
+            <option value="COMPLETED">Completed</option>
+          </select>
+          <button
+            type="submit"
+            className="bg-green-600 ml-10 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition"
+          >
+            Save Milestone
+          </button>
+        </form>
+      )}
+
+      {milestones.length === 0 ? (
+        <p className="text-slate-500">No milestones yet.</p>
+      ) : (
+        <div className="grid gap-6">
+          {milestones.map((m) => (
+            <div
+              key={m.id}
+              className="bg-white rounded-xl shadow-md p-6 border hover:shadow-lg transition"
             >
-              <option value="PENDING">Pending</option>
-              <option value="COMPLETED">Completed</option>
-            </select>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-md transition"
-            >
-              ✅ Save Milestone
-            </button>
-          </form>
-        )}
+              <p className="text-lg font-semibold text-slate-800 mb-3">
+                {m.description}
+              </p>
 
-        {/* Milestones List */}
-        {milestones.length === 0 ? (
-          <p className="text-slate-500 text-center">No milestones yet.</p>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-6">
-            {milestones.map((m) => (
-              <div
-                key={m.id}
-                className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 hover:shadow-2xl transition duration-300"
-              >
-                <p className="text-lg font-semibold text-slate-800 mb-2">{m.description}</p>
-
-                <div className="mt-3 flex items-center gap-3">
-                  <label className="text-sm font-medium text-slate-600">Status:</label>
-                  <select
-                    value={m.status}
-                    onChange={(e) => handleMilestoneStatusChange(m.id, e.target.value)}
-                    className="px-3 py-1 border rounded-md shadow-sm focus:ring focus:ring-blue-300"
-                  >
-                    <option value="PENDING">Pending</option>
-                    <option value="COMPLETED">Completed</option>
-                  </select>
-                </div>
-
-                <div className="mt-4 flex flex-col gap-2">
-                  <button
-                    onClick={() => navigate(`/projects/${projectId}/milestones/${m.id}/upload`)}
-                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow transition"
-                  >
-                    ⬆️ Upload File
-                  </button>
-
-                  {m.fileName && (
-                    <button
-                      onClick={() => handleDeleteFile(m.id)}
-                      className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg shadow transition"
-                    >
-                      🗑️ Delete File
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => handleDeleteMilestone(m.id)}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow transition"
-                  >
-                    ❌ Delete Milestone
-                  </button>
-                </div>
+              <div className="flex items-center gap-3 mb-4">
+                <label className="font-medium text-slate-700">Status:</label>
+                <select
+                  value={m.status}
+                  onChange={(e) =>
+                    handleMilestoneStatusChange(m.id, e.target.value)
+                  }
+                  className="px-3 py-1 border rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
+                >
+                  <option value="PENDING">Pending</option>
+                  <option value="COMPLETED">Completed</option>
+                </select>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() =>
+                    navigate(`/projects/${projectId}/milestones/${m.id}/upload`)
+                  }
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+                >
+                  Upload File
+                </button>
+
+                {m.fileName && (
+                  <button
+                    onClick={() => handleDeleteFile(m.id)}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg shadow hover:bg-red-700 transition"
+                  >
+                    Delete File
+                  </button>
+                )}
+
+                <button
+                  onClick={() => handleDeleteMilestone(m.id)}
+                  className="bg-rose-500 text-white px-4 py-2 rounded-lg shadow hover:bg-rose-600 transition"
+                >
+                  Delete Milestone
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

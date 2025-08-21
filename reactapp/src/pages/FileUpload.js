@@ -1,15 +1,20 @@
+// src/pages/FileUpload.js
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+import { FaTrash, FaFileUpload, FaArrowLeft } from "react-icons/fa";
 
 export default function FileUpload() {
   const { projectId, milestoneId } = useParams();
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
     fetchUploadedFiles();
@@ -24,25 +29,20 @@ export default function FileUpload() {
       setUploadedFiles(res.data || []);
     } catch (err) {
       console.error("Error fetching files:", err);
+      toast.error("Failed to fetch uploaded files.");
     }
   };
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-    setMessage("");
-  };
+  const handleFileChange = (e) => setFile(e.target.files[0]);
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!file) {
-      setMessage("⚠ Please choose a file first.");
-      return;
-    }
+    if (!file) return toast.error("Please select a file to upload.");
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("projectId", projectId);
     setUploading(true);
-    setMessage("");
 
     try {
       const res = await axios.post(
@@ -55,157 +55,138 @@ export default function FileUpload() {
           },
         }
       );
-      setMessage(`✅ File "${res.data.fileName}" uploaded successfully!`);
+      toast.success(`File "${res.data.fileName}" uploaded successfully!`);
       setFile(null);
       fetchUploadedFiles();
     } catch (err) {
-      console.error("Upload failed:", err);
-      setMessage(
-        err.response?.data?.message ||
-          "❌ Failed to upload file. Please try again."
-      );
+      console.error(err);
+      toast.error("Failed to upload file. Try again.");
     } finally {
       setUploading(false);
     }
   };
 
-  const handleDelete = async (fileId) => {
-    if (!window.confirm("Are you sure you want to delete this file?")) return;
+  const confirmDelete = (fileObj) => {
+    setSelectedFile(fileObj);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/files/${fileId}`, {
+      await axios.delete(`http://localhost:8080/files/${selectedFile.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setMessage("🗑 File deleted successfully.");
+      toast.success("File deleted successfully!");
       fetchUploadedFiles();
     } catch (err) {
-      console.error("Delete failed:", err);
-      setMessage("❌ Failed to delete file.");
+      console.error(err);
+      toast.error("Failed to delete file.");
+    } finally {
+      setDeleteModalOpen(false);
+      setSelectedFile(null);
     }
   };
 
   return (
-    <div
-      style={{
-        padding: "40px",
-        maxWidth: "650px",
-        margin: "50px auto",
-        background: "#fff",
-        borderRadius: "12px",
-        boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      }}
-    >
-      <h2 style={{ textAlign: "center", marginBottom: "30px", color: "#007bff" }}>
-        Upload File for Milestone {milestoneId}
-      </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-blue-50 p-6">
+      <Toaster position="top-right" />
 
-      <form
-        onSubmit={handleUpload}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "15px",
-          alignItems: "stretch",
-        }}
-      >
-        <input
-          type="file"
-          onChange={handleFileChange}
-          style={{
-            padding: "10px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
-        />
-        {file && <p style={{ color: "#555" }}>📄 Selected: {file.name}</p>}
-
+      {/* Upload Card */}
+      <div className="bg-white shadow-xl rounded-2xl w-full max-w-lg p-8 flex flex-col gap-6">
+        {/* Back Button */}
         <button
-          type="submit"
-          disabled={uploading}
-          style={{
-            padding: "12px",
-            backgroundColor: uploading ? "#6c757d" : "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: uploading ? "not-allowed" : "pointer",
-            fontWeight: "600",
-            transition: "background 0.3s",
-          }}
-          onMouseOver={(e) =>
-            !uploading && (e.currentTarget.style.background = "#0056b3")
-          }
-          onMouseOut={(e) =>
-            !uploading && (e.currentTarget.style.background = "#007bff")
-          }
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-800 transition-colors mb-4"
         >
-          {uploading ? "Uploading..." : "Upload"}
+          <FaArrowLeft /> Back
         </button>
-      </form>
 
-      {message && (
-        <p
-          style={{
-            marginTop: "20px",
-            padding: "12px",
-            borderRadius: "8px",
-            backgroundColor: "#f0f4f8",
-            color: "#333",
-            fontWeight: "500",
-          }}
-        >
-          {message}
-        </p>
-      )}
+        <h2 className="text-2xl font-bold text-center text-blue-600 flex items-center justify-center gap-2">
+          <FaFileUpload /> Upload File for Milestone {milestoneId}
+        </h2>
 
-      <hr style={{ margin: "30px 0", borderColor: "#eee" }} />
+        <form onSubmit={handleUpload} className="flex flex-col gap-4">
+          <input
+            type="file"
+            onChange={handleFileChange}
+            className="p-3 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          {file && (
+            <p className="text-gray-700 font-medium">📄 Selected: {file.name}</p>
+          )}
+          <button
+            type="submit"
+            disabled={uploading}
+            className={`p-3 rounded-lg text-white font-semibold transition-colors ${
+              uploading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+          >
+            {uploading ? "Uploading..." : "Upload"}
+          </button>
+        </form>
 
-      <h3 style={{ marginBottom: "20px", color: "#007bff" }}>Uploaded Files</h3>
-      {uploadedFiles.length > 0 ? (
-        <ul style={{ listStyle: "none", padding: "0", display: "flex", flexDirection: "column", gap: "12px" }}>
-          {uploadedFiles.map((f) => (
-            <li
-              key={f.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "12px",
-                borderRadius: "8px",
-                background: "#f9f9f9",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
-              }}
-            >
-              <a
-                href={`http://localhost:8080/files/download/${f.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: "#007bff", fontWeight: "500", textDecoration: "none" }}
-              >
-                {f.fileName}
-              </a>
+        {/* Uploaded Files */}
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold text-blue-600 mb-4">
+            Uploaded Files
+          </h3>
+          {uploadedFiles.length > 0 ? (
+            <ul className="flex flex-col gap-3">
+              {uploadedFiles.map((f) => (
+                <li
+                  key={f.id}
+                  className="flex justify-between items-center p-3 bg-gray-50 rounded-lg shadow-sm"
+                >
+                  <a
+                    href={`http://localhost:8080/files/download/${f.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 font-medium hover:underline"
+                  >
+                    {f.fileName}
+                  </a>
+                  <button
+                    onClick={() => confirmDelete(f)}
+                    className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                  >
+                    <FaTrash /> Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-600">No files uploaded yet.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && selectedFile && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full text-center">
+            <h3 className="text-lg font-bold mb-4">Delete File</h3>
+            <p className="mb-6">
+              Are you sure you want to delete{" "}
+              <strong>{selectedFile.fileName}</strong>?
+            </p>
+            <div className="flex justify-center gap-4">
               <button
-                onClick={() => handleDelete(f.id)}
-                style={{
-                  padding: "6px 12px",
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  fontWeight: "500",
-                  transition: "background 0.2s",
-                }}
-                onMouseOver={(e) => (e.currentTarget.style.background = "#b02a37")}
-                onMouseOut={(e) => (e.currentTarget.style.background = "#dc3545")}
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-colors"
               >
-                Delete
+                Yes, Delete
               </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p style={{ color: "#555" }}>No files uploaded yet.</p>
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
