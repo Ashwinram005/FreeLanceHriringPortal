@@ -29,6 +29,7 @@
   },
   "scripts": {
     "start": "react-scripts start --disable-host-check --host 0.0.0.0",
+        "prebuild": "chmod +x node_modules/.bin/react-scripts",
     "build": "npx react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
