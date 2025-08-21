@@ -116,195 +116,134 @@ export default function Milestones() {
       .catch((err) => console.error(err));
   };
 
+  const completedCount = milestones.filter(m => m.status === "COMPLETED").length;
+  const completionPercent = milestones.length ? (completedCount / milestones.length) * 100 : 0;
+
   return (
-    <div style={{ padding: "30px", maxWidth: "900px", margin: "0 auto" }}>
-      <h2 style={{ marginBottom: "20px", color: "#007bff" }}>
-        Milestones for Project {projectId}
-      </h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-10 px-5">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h2 className="text-4xl font-bold text-slate-800 mb-2">📌 Project Milestones</h2>
+          <p className="text-slate-600">Track progress and manage all project milestones efficiently.</p>
 
-      {contractStatus && (
-        <div style={{ marginBottom: "25px" }}>
-          <label style={{ fontWeight: "bold", marginRight: "10px" }}>
-            Contract Status:
-          </label>
-          <select
-            value={contractStatus}
-            onChange={(e) => handleContractStatusChange(e.target.value)}
-            style={{
-              padding: "6px 10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
-          >
-            <option value="PENDING">Pending</option>
-            <option value="COMPLETED">Completed</option>
-          </select>
-        </div>
-      )}
-
-      <button
-        onClick={() => setShowForm(!showForm)}
-        style={{
-          marginBottom: "20px",
-          padding: "8px 14px",
-          backgroundColor: "#007bff",
-          color: "white",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-          fontWeight: "500",
-        }}
-      >
-        {showForm ? "Cancel" : "Add Milestone"}
-      </button>
-
-      {showForm && (
-        <form
-          onSubmit={handleAddMilestone}
-          style={{
-            marginBottom: "25px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-          }}
-        >
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            placeholder="Milestone description..."
-            style={{
-              width: "100%",
-              minHeight: "70px",
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-              resize: "vertical",
-            }}
-          />
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            style={{
-              padding: "8px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-              width: "150px",
-            }}
-          >
-            <option value="PENDING">Pending</option>
-            <option value="COMPLETED">Completed</option>
-          </select>
-          <button
-            type="submit"
-            style={{
-              padding: "8px 14px",
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              width: "120px",
-            }}
-          >
-            Save Milestone
-          </button>
-        </form>
-      )}
-
-      {milestones.length === 0 ? (
-        <p style={{ color: "#555" }}>No milestones yet.</p>
-      ) : (
-        <div
-          style={{
-            display: "grid",
-            gap: "20px",
-          }}
-        >
-          {milestones.map((m) => (
-            <div
-              key={m.id}
-              style={{
-                padding: "20px",
-                borderRadius: "10px",
-                backgroundColor: "#f9f9f9",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-              }}
-            >
-              <p style={{ fontSize: "16px", fontWeight: "500" }}>{m.description}</p>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <label style={{ fontWeight: "500" }}>Status:</label>
-                <select
-                  value={m.status}
-                  onChange={(e) =>
-                    handleMilestoneStatusChange(m.id, e.target.value)
-                  }
-                  style={{
-                    padding: "6px",
-                    borderRadius: "6px",
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  <option value="PENDING">Pending</option>
-                  <option value="COMPLETED">Completed</option>
-                </select>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <button
-                  onClick={() =>
-                    navigate(`/projects/${projectId}/milestones/${m.id}/upload`)
-                  }
-                  style={{
-                    padding: "8px",
-                    backgroundColor: "#17a2b8",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Upload File
-                </button>
-
-                {m.fileName && (
-                  <button
-                    onClick={() => handleDeleteFile(m.id)}
-                    style={{
-                      padding: "8px",
-                      backgroundColor: "#dc3545",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Delete File
-                  </button>
-                )}
-
-                <button
-                  onClick={() => handleDeleteMilestone(m.id)}
-                  style={{
-                    padding: "8px",
-                    backgroundColor: "#ff4d4f",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Delete Milestone
-                </button>
-              </div>
+          {milestones.length > 0 && (
+            <div className="mt-4 bg-slate-200 rounded-full h-4 w-full overflow-hidden shadow-inner">
+              <div
+                className="h-4 bg-blue-600 rounded-full transition-all duration-500"
+                style={{ width: `${completionPercent}%` }}
+              ></div>
             </div>
-          ))}
+          )}
         </div>
-      )}
+
+        {/* Contract Status */}
+        {contractStatus && (
+          <div className="mb-6 bg-white shadow-md p-4 rounded-xl flex items-center gap-4">
+            <label className="font-semibold text-slate-700">Contract Status:</label>
+            <select
+              value={contractStatus}
+              onChange={(e) => handleContractStatusChange(e.target.value)}
+              className="px-4 py-2 border rounded-lg shadow-sm focus:ring focus:ring-blue-300"
+            >
+              <option value="PENDING">Pending</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+          </div>
+        )}
+
+        {/* Add Milestone Button */}
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className={`mb-6 px-6 py-2 font-medium rounded-lg shadow-md transition 
+            ${showForm ? "bg-red-500 hover:bg-red-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
+        >
+          {showForm ? "Cancel" : "➕ Add Milestone"}
+        </button>
+
+        {/* Add Milestone Form */}
+        {showForm && (
+          <form
+            onSubmit={handleAddMilestone}
+            className="mb-8 bg-white shadow-xl rounded-2xl p-6 space-y-4"
+          >
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              placeholder="Enter milestone description..."
+              className="w-full min-h-[100px] px-4 py-3 border rounded-xl shadow-sm focus:ring focus:ring-blue-300 resize-none"
+            />
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="px-4 py-2 border rounded-xl shadow-sm focus:ring focus:ring-blue-300"
+            >
+              <option value="PENDING">Pending</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+            <button
+              type="submit"
+              className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-md transition"
+            >
+              ✅ Save Milestone
+            </button>
+          </form>
+        )}
+
+        {/* Milestones List */}
+        {milestones.length === 0 ? (
+          <p className="text-slate-500 text-center">No milestones yet.</p>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {milestones.map((m) => (
+              <div
+                key={m.id}
+                className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 hover:shadow-2xl transition duration-300"
+              >
+                <p className="text-lg font-semibold text-slate-800 mb-2">{m.description}</p>
+
+                <div className="mt-3 flex items-center gap-3">
+                  <label className="text-sm font-medium text-slate-600">Status:</label>
+                  <select
+                    value={m.status}
+                    onChange={(e) => handleMilestoneStatusChange(m.id, e.target.value)}
+                    className="px-3 py-1 border rounded-md shadow-sm focus:ring focus:ring-blue-300"
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="COMPLETED">Completed</option>
+                  </select>
+                </div>
+
+                <div className="mt-4 flex flex-col gap-2">
+                  <button
+                    onClick={() => navigate(`/projects/${projectId}/milestones/${m.id}/upload`)}
+                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow transition"
+                  >
+                    ⬆️ Upload File
+                  </button>
+
+                  {m.fileName && (
+                    <button
+                      onClick={() => handleDeleteFile(m.id)}
+                      className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg shadow transition"
+                    >
+                      🗑️ Delete File
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => handleDeleteMilestone(m.id)}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow transition"
+                  >
+                    ❌ Delete Milestone
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

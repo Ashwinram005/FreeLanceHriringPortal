@@ -1,6 +1,15 @@
 // src/components/Navbar.js
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  FolderPlus,
+  Briefcase,
+  User,
+  LogOut,
+} from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -11,122 +20,128 @@ export default function Navbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("userId");
-    navigate("/login");
+    window.location.href = "/login";
   };
 
-  const navStyle = {
-    background: "rgba(255, 255, 255, 0.75)",
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
-    borderBottom: "1px solid rgba(0,0,0,0.08)",
-    padding: "12px 28px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    position: "sticky",
-    top: 0,
-    zIndex: 100,
-    fontFamily: "'Inter', sans-serif",
-  };
-
-  const linkContainerStyle = {
-    display: "flex",
-    alignItems: "center",
-    gap: "22px",
-  };
-
-  const linkStyle = (path) => ({
-    textDecoration: "none",
-    fontWeight: "600",
-    fontSize: "15px",
-    color: location.pathname === path ? "#2563eb" : "#111827",
-    paddingBottom: "4px",
-    borderBottom:
-      location.pathname === path ? "2px solid #2563eb" : "2px solid transparent",
-    transition: "all 0.25s ease",
-  });
-
-  const logoutButtonStyle = {
-    background: "#2563eb",
-    color: "#fff",
-    border: "none",
-    padding: "8px 18px",
-    borderRadius: "50px",
-    cursor: "pointer",
-    fontWeight: "600",
-    fontSize: "14px",
-    transition: "all 0.25s ease",
-  };
+  const linkClass = (path) =>
+    `flex items-center gap-3 px-4 py-3 rounded-lg text-base font-semibold tracking-wide transition-all duration-300
+     ${
+       location.pathname === path
+         ? "bg-white/20 text-white shadow-md backdrop-blur-sm"
+         : "text-white/80 hover:text-white hover:bg-white/10"
+     }`;
 
   return (
-    <nav style={navStyle}>
-      <div style={{ fontWeight: "800", fontSize: "18px", color: "#111827" }}>
-        Freelance<span style={{ color: "#2563eb" }}>Hub</span>
+    <aside
+      className="fixed left-0 top-0 h-screen w-64 
+                 bg-gradient-to-b from-indigo-700 via-blue-700 to-cyan-600
+                 text-white shadow-xl flex flex-col z-50 border-r border-white/10"
+    >
+      {/* Logo / Brand */}
+      <div className="px-6 py-6 border-b border-white/20">
+        <h1 className="text-2xl font-bold tracking-wide drop-shadow-md">
+          Freelance<span className="text-yellow-300 font-extrabold">Hub</span>
+        </h1>
       </div>
 
-      <div style={linkContainerStyle}>
-        {role === "ADMIN" && (
-          <>
-            <Link to="/manage-users" style={linkStyle("/manage-users")}>
-              Manage Users
-            </Link>
-            <Link to="/view-contracts" style={linkStyle("/view-contracts")}>
-              Contracts
-            </Link>
-            <Link to="/dashboard" style={linkStyle("/dashboard")}>
-              Client Dashboard
-            </Link>
-            <Link to="/post-project" style={linkStyle("/post-project")}>
-              Post Project
-            </Link>
-           
-          </>
-        )}
+      {/* Nav Links */}
+      <nav className="flex-1 overflow-y-auto px-3 py-6">
+        <ul className="space-y-2">
+          {role === "ADMIN" && (
+            <>
+              <li>
+                <Link to="/manage-users" className={linkClass("/manage-users")}>
+                  <Users size={20} /> Manage Users
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/view-contracts"
+                  className={linkClass("/view-contracts")}
+                >
+                  <FileText size={20} /> Contracts
+                </Link>
+              </li>
+              <li>
+                <Link to="/dashboard" className={linkClass("/dashboard")}>
+                  <LayoutDashboard size={20} /> Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link to="/post-project" className={linkClass("/post-project")}>
+                  <FolderPlus size={20} /> Post Project
+                </Link>
+              </li>
+            </>
+          )}
 
-        {role === "CLIENT" && (
-          <>
-            <Link to="/dashboard" style={linkStyle("/dashboard")}>
-              Dashboard
-            </Link>
-            <Link to="/post-project" style={linkStyle("/post-project")}>
-              Post Project
-            </Link>
-            <Link to="/contracts" style={linkStyle("/contracts")}>
-              Contracts
-            </Link>
-          </>
-        )}
+          {role === "CLIENT" && (
+            <>
+              <li>
+                <Link to="/dashboard" className={linkClass("/dashboard")}>
+                  <LayoutDashboard size={20} /> Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link to="/post-project" className={linkClass("/post-project")}>
+                  <FolderPlus size={20} /> Post Project
+                </Link>
+              </li>
+              <li>
+                <Link to="/contracts" className={linkClass("/contracts")}>
+                  <FileText size={20} /> Contracts
+                </Link>
+              </li>
+            </>
+          )}
 
-        {role === "FREELANCER" && (
-          <>
-            <Link
-              to="/freelancer-dashboard"
-              style={linkStyle("/freelancer-dashboard")}
-            >
-              Dashboard
-            </Link>
-            <Link to="/browse-projects" style={linkStyle("/browse-projects")}>
-              Browse
-            </Link>
-            <Link to="/contracts" style={linkStyle("/contracts")}>
-              Contracts
-            </Link>
-          </>
-        )}
+          {role === "FREELANCER" && (
+            <>
+              <li>
+                <Link
+                  to="/freelancer-dashboard"
+                  className={linkClass("/freelancer-dashboard")}
+                >
+                  <LayoutDashboard size={20} /> Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/browse-projects"
+                  className={linkClass("/browse-projects")}
+                >
+                  <Briefcase size={20} /> Browse Projects
+                </Link>
+              </li>
+              <li>
+                <Link to="/contracts" className={linkClass("/contracts")}>
+                  <FileText size={20} /> Contracts
+                </Link>
+              </li>
+            </>
+          )}
 
-        <Link to="/profile" style={linkStyle("/profile")}>
-          Profile
-        </Link>
+          <li>
+            <Link to="/profile" className={linkClass("/profile")}>
+              <User size={20} /> Profile
+            </Link>
+          </li>
+        </ul>
+      </nav>
+
+      {/* Logout Button */}
+      <div className="px-6 py-5 border-t border-white/20">
+        <button
+          onClick={logout}
+          className="w-full flex items-center justify-center gap-2 
+                     bg-gradient-to-r from-pink-500 to-red-500 
+                     text-white font-bold py-2.5 px-4 rounded-lg 
+                     hover:from-pink-600 hover:to-red-600 
+                     shadow-md hover:shadow-lg transition-all duration-300"
+        >
+          <LogOut size={20} /> Logout
+        </button>
       </div>
-
-      <button
-        onClick={logout}
-        style={logoutButtonStyle}
-        onMouseOver={(e) => (e.currentTarget.style.background = "#1d4ed8")}
-        onMouseOut={(e) => (e.currentTarget.style.background = "#2563eb")}
-      >
-        Logout
-      </button>
-    </nav>
+    </aside>
   );
 }

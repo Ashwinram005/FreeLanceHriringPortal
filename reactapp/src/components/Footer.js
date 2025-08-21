@@ -2,30 +2,12 @@
 import React from "react";
 
 export default function Footer() {
-  const footerStyle = {
-    background: "#1f2937", // dark background to match header/navbar
-    color: "#f1f5f9",
-    textAlign: "center",
-    padding: "15px 10px",
-    fontSize: "14px",
-    fontWeight: "500",
-    boxShadow: "0 -2px 6px rgba(0,0,0,0.2)",
-    borderTopLeftRadius: "10px",
-    borderTopRightRadius: "10px",
-    position: "relative",
-  };
-
-  const linkStyle = {
-    color: "#3b82f6",
-    textDecoration: "none",
-    margin: "0 5px",
-  };
-
   return (
-    <footer style={footerStyle}>
-      &copy; {new Date().getFullYear()} My Freelance Platform. All rights reserved.{" "}
-      <a href="/privacy" style={linkStyle}>Privacy Policy</a> |{" "}
-      <a href="/terms" style={linkStyle}>Terms of Service</a>
+    <footer className="bg-gray-900 text-gray-100 text-center py-4 px-2 text-sm font-medium shadow-inner rounded-t-lg">
+      &copy; {new Date().getFullYear()} My Freelance Platform. All rights
+      reserved.{" "}
+      <a className="text-blue-500 hover:underline mx-1">Privacy Policy</a> |{" "}
+      <a className="text-blue-500 hover:underline mx-1">Terms of Service</a>
     </footer>
   );
 }

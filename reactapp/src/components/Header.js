@@ -2,44 +2,17 @@
 import React from "react";
 
 export default function Header() {
-  const headerWrapper = {
-    background: "linear-gradient(135deg, #2563eb, #06b6d4)",
-    color: "#fff",
-    padding: "60px 20px",
-    textAlign: "center",
-    fontFamily: "'Inter', sans-serif",
-    position: "relative",
-    overflow: "hidden",
-    borderBottomLeftRadius: "30px",
-    borderBottomRightRadius: "30px",
-  };
-
-  const titleStyle = {
-    fontSize: "36px",
-    fontWeight: "800",
-    marginBottom: "10px",
-  };
-
-  const subTextStyle = {
-    fontSize: "18px",
-    fontWeight: "500",
-    marginBottom: "6px",
-    color: "rgba(255,255,255,0.9)",
-  };
-
-  const taglineStyle = {
-    fontSize: "15px",
-    color: "rgba(255,255,255,0.85)",
-    marginTop: "8px",
-  };
-
   return (
-    <header style={headerWrapper}>
-      <div style={titleStyle}>✨ FreelanceHub</div>
-      <div style={subTextStyle}>Where Projects Meet Talent</div>
-      <div style={taglineStyle}>
+    <header className="relative overflow-hidden text-center text-gray-900 px-6 py-20 rounded-b-[40px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-lg">
+      <h1 className="text-5xl font-extrabold tracking-tight drop-shadow-md">
+        ✨ FreelanceHub
+      </h1>
+      <p className="mt-4 text-xl font-medium text-white/90">
+        Where Projects Meet Talent
+      </p>
+      <p className="mt-3 text-base text-white/80">
         Post, Browse, and Collaborate — all in one platform.
-      </div>
+      </p>
     </header>
   );
 }

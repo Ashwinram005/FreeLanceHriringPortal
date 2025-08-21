@@ -1,147 +1,159 @@
+// src/pages/Register.js
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { registerUser } from "../api";
 import { validateEmail, validatePassword } from "../utils";
 
 export default function Register() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [role, setRole] = useState("CLIENT");
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("CLIENT");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
 
-        if (!validateEmail(email) || !validatePassword(password)) {
-            alert("Invalid email or password (min 6 characters).");
-            return;
-        }
+    if (!validateEmail(email) || !validatePassword(password)) {
+      setError("Please enter a valid email and password (min 6 characters).");
+      return;
+    }
 
-        try {
-            const newUser = await registerUser({ name, email, password, role });
-            alert("Registration successful! Please login.");
-            window.location.href = "/login";
-        } catch (err) {
-            if (err.response && err.response.data) {
-                alert(err.response.data.message || "Registration failed.");
-            } else {
-                alert("Server not reachable.");
-            }
-        }
-    };
+    try {
+      setLoading(true);
+      await registerUser({ name, email, password, role });
+      alert("🎉 Registration successful! Please login.");
+      navigate("/login");
+    } catch (err) {
+      if (err.response && err.response.data) {
+        setError(err.response.data.message || "Registration failed.");
+      } else {
+        setError("Server not reachable.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div style={styles.container}>
-            <form style={styles.form} onSubmit={handleRegister}>
-                <h2 style={styles.title}>Create Account</h2>
-                <p style={styles.subtitle}>Sign up to start hiring or freelancing</p>
-                
-                <input
-                    type="text"
-                    placeholder="Full Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    style={styles.input}
-                />
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    style={styles.input}
-                />
-                <input
-                    type="password"
-                    placeholder="Password (min 6 chars)"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    style={styles.input}
-                />
-
-                <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    style={styles.input}
-                >
-                    <option value="CLIENT">Client</option>
-                    <option value="FREELANCER">Freelancer</option>
-                </select>
-
-                <button type="submit" style={styles.button}>
-                    Register
-                </button>
-
-                <p style={styles.loginText}>
-                    Already have an account?{" "}
-                    <a href="/login" style={styles.loginLink}>
-                        Login
-                    </a>
-                </p>
-            </form>
+  return (
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Left Branding Section (same as Login) */}
+      <div className="hidden lg:flex flex-col justify-center items-center bg-gradient-to-br from-indigo-700 via-blue-700 to-cyan-600 text-white p-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+        <div className="relative z-10 max-w-md text-center animate-fadeIn">
+          <h1 className="text-5xl font-extrabold mb-4 drop-shadow-xl">
+            FreelanceHub
+          </h1>
+          <p className="text-lg font-medium mb-3">
+            🌟 Start Your Journey Today
+          </p>
+          <p className="text-white/90 leading-relaxed">
+            Create your account and explore opportunities as a client or freelancer.
+          </p>
+          {/* Illustration */}
+          <img
+            src="https://illustrations.popsy.co/gray/remote-work.svg"
+            alt="Register illustration"
+            className="mt-10 w-72 mx-auto drop-shadow-lg hover:scale-105 transition"
+          />
         </div>
-    );
-}
+      </div>
 
-const styles = {
-    container: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        background: "#eef2f7",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    },
-    form: {
-        background: "#fff",
-        padding: "40px 35px",
-        borderRadius: "12px",
-        boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-        width: "360px",
-        textAlign: "center",
-    },
-    title: {
-        marginBottom: "8px",
-        color: "#333",
-        fontSize: "26px",
-        fontWeight: "600",
-    },
-    subtitle: {
-        marginBottom: "20px",
-        color: "#555",
-        fontSize: "14px",
-    },
-    input: {
-        width: "100%",
-        padding: "12px",
-        margin: "10px 0",
-        border: "1px solid #ccc",
-        borderRadius: "8px",
-        fontSize: "14px",
-        outline: "none",
-        transition: "0.3s",
-    },
-    button: {
-        width: "100%",
-        padding: "12px",
-        marginTop: "15px",
-        backgroundColor: "#007BFF",
-        color: "#fff",
-        border: "none",
-        borderRadius: "8px",
-        cursor: "pointer",
-        fontSize: "16px",
-        fontWeight: "500",
-        transition: "0.3s",
-    },
-    loginText: {
-        marginTop: "15px",
-        fontSize: "14px",
-        color: "#555",
-    },
-    loginLink: {
-        color: "#007BFF",
-        textDecoration: "underline",
-    },
-};
+      {/* Right Register Section */}
+      <div className="flex items-center justify-center px-6 lg:px-12">
+        <form
+          onSubmit={handleRegister}
+          className="bg-white/90 shadow-2xl rounded-2xl px-8 py-10 w-full max-w-md backdrop-blur-md border border-gray-200 animate-slideUp"
+        >
+          <h2 className="text-3xl font-extrabold text-gray-800 mb-2">
+            Create Account
+          </h2>
+          <p className="text-gray-500 mb-6">Sign up to get started 🚀</p>
+
+          {error && (
+            <p className="text-red-500 text-sm mb-3 bg-red-50 px-3 py-2 rounded-md border border-red-200">
+              {error}
+            </p>
+          )}
+
+          <div className="mb-4">
+            <label className="block text-left text-sm font-medium text-gray-700 mb-1">
+              Full Name
+            </label>
+            <input
+              type="text"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-left text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-left text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="********"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+            />
+          </div>
+
+          <div className="mb-5">
+            <label className="block text-left text-sm font-medium text-gray-700 mb-1">
+              Role
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition bg-white"
+            >
+              <option value="CLIENT">Client</option>
+              <option value="FREELANCER">Freelancer</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 disabled:opacity-70 text-white font-semibold py-3 rounded-lg shadow-md transition transform hover:scale-[1.02]"
+          >
+            {loading ? "Registering..." : "Register"}
+          </button>
+
+          <p className="mt-6 text-sm text-gray-600 text-center">
+            Already have an account?{" "}
+            <span
+              className="text-indigo-600 cursor-pointer hover:underline font-medium"
+              onClick={() => navigate("/login")}
+            >
+              Login here
+            </span>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+}

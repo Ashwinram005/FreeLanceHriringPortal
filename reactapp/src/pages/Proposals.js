@@ -1,3 +1,4 @@
+// src/pages/Proposals.js
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -80,95 +81,100 @@ export default function Proposals() {
     }
   };
 
-  if (loading) return <p>Loading proposals...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <p className="text-center mt-10">Loading proposals...</p>;
+  if (error) return <p className="text-red-500 text-center mt-10">{error}</p>;
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Project Proposals</h2>
-      <button
-        onClick={() => setSortAsc(!sortAsc)}
-        style={{ marginBottom: "15px", padding: "5px 10px" }}
-      >
-        Sort by Bid Amount ({sortAsc ? "Asc" : "Desc"})
-      </button>
+    <div className="max-w-5xl mx-auto px-6 py-10">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent drop-shadow-md">
+          Project Proposals
+        </h2>
+        <button
+          onClick={() => setSortAsc(!sortAsc)}
+          className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-md hover:from-indigo-700 hover:to-blue-700 transition-all"
+        >
+          Sort by Bid ({sortAsc ? "Asc" : "Desc"})
+        </button>
+      </div>
 
       {displayedProposals.length === 0 ? (
-        <p>No proposals yet for this project.</p>
+        <p className="text-gray-600 text-center">
+          No proposals yet for this project.
+        </p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <div className="space-y-6">
           {displayedProposals.map((p) => (
-            <li
+            <div
               key={p.id}
-              style={{
-                border: "1px solid #ccc",
-                padding: "10px",
-                borderRadius: "5px",
-                marginBottom: "15px",
-              }}
+              className="bg-white rounded-xl shadow-md p-6 border border-gray-200 hover:shadow-xl transition-all"
             >
-              <p>
-                <strong>Freelancer ID:</strong> {p.freelancerId}{" "}
-                <button
-                  onClick={() => navigate(`/profile/${p.freelancerId}`)}
-                  style={{
-                    marginLeft: "10px",
-                    padding: "3px 8px",
-                    fontSize: "12px",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    background: "#3b82f6",
-                    color: "#fff",
-                    border: "none",
-                  }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.background = "#2563eb")
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.background = "#3b82f6")
-                  }
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-lg font-semibold text-gray-800">
+                    Freelancer ID: {p.freelancerId}
+                  </p>
+                  <button
+                    onClick={() => navigate(`/profile/${p.freelancerId}`)}
+                    className="mt-2 inline-block px-3 py-1 text-sm rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                  >
+                    View Profile
+                  </button>
+                </div>
+
+                {/* Status Badge */}
+                <span
+                  className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                    p.status === "ACCEPTED"
+                      ? "bg-green-100 text-green-700"
+                      : p.status === "REJECTED"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
                 >
-                  View Profile
-                </button>
+                  {p.status}
+                </span>
+              </div>
+
+              <p className="mt-4 text-gray-700">
+                <strong>Bid Amount:</strong>{" "}
+                <span className="text-indigo-600 font-bold">${p.bidAmount}</span>
               </p>
-              <p>
-                <strong>Bid Amount:</strong> {p.bidAmount}
-              </p>
-              <p>
-                <strong>Status:</strong> {p.status}
-              </p>
+
+              {/* Action Buttons */}
               {p.status === "PENDING" && (
-                <>
+                <div className="mt-4 flex gap-3">
                   <button
                     onClick={() => updateProposalStatus(p.id, "ACCEPTED")}
-                    style={{ marginRight: "10px", padding: "5px 10px" }}
+                    className="px-4 py-2 rounded-lg bg-green-500 text-white shadow hover:bg-green-600 transition"
                   >
                     Accept
                   </button>
                   <button
                     onClick={() => updateProposalStatus(p.id, "REJECTED")}
-                    style={{ padding: "5px 10px" }}
+                    className="px-4 py-2 rounded-lg bg-red-500 text-white shadow hover:bg-red-600 transition"
                   >
                     Reject
                   </button>
-                </>
+                </div>
               )}
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
-      {/* Pagination Controls */}
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div style={{ marginTop: "10px" }}>
+        <div className="flex justify-center items-center gap-4 mt-8">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            style={{ marginRight: "5px" }}
+            className="px-4 py-2 rounded-lg border bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
           >
             Previous
           </button>
-          <span>
+          <span className="text-gray-600 font-medium">
             Page {currentPage} of {totalPages}
           </span>
           <button
@@ -176,7 +182,7 @@ export default function Proposals() {
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }
             disabled={currentPage === totalPages}
-            style={{ marginLeft: "5px" }}
+            className="px-4 py-2 rounded-lg border bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
           >
             Next
           </button>
