@@ -128,7 +128,7 @@ export default function Register() {
             >
               <option value="CLIENT">Client</option>
               <option value="FREELANCER">Freelancer</option>
-              {/* <option value="ADMIN">Admin</option> */}
+              <option value="ADMIN">Admin</option>
             </select>
           </div>
 

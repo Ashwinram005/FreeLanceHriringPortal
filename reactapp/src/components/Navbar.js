@@ -62,16 +62,16 @@ export default function Navbar() {
                   <FileText size={20} /> Contracts
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/dashboard" className={linkClass("/dashboard")}>
                   <LayoutDashboard size={20} /> Dashboard
                 </Link>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <Link to="/post-project" className={linkClass("/post-project")}>
                   <FolderPlus size={20} /> Post Project
                 </Link>
-              </li>
+              </li> */}
             </>
           )}
 

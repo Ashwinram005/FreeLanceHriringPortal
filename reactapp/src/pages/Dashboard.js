@@ -2,7 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaSearch } from "react-icons/fa";
+import {
+  FaSearch,
+  FaFolderOpen,
+  FaTasks,
+  FaCheckCircle,
+  FaLayerGroup,
+} from "react-icons/fa";
 
 export default function Dashboard() {
   const [projects, setProjects] = useState([]);
@@ -86,6 +92,14 @@ export default function Dashboard() {
     currentPage * pageSize
   );
 
+  // Summary Data
+  const totalCount = projects.length;
+  const openCount = projects.filter((p) => p.status === "OPEN").length;
+  const inProgressCount = projects.filter(
+    (p) => p.status === "IN_PROGRESS"
+  ).length;
+  const closedCount = projects.filter((p) => p.status === "CLOSED").length;
+
   if (loading)
     return (
       <p className="text-center text-lg text-gray-500 mt-10 animate-pulse">
@@ -96,14 +110,36 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-indigo-100 p-6">
-      {/* Page Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 text-white p-8 rounded-2xl shadow-xl mb-10">
-        <h2 className="text-3xl font-extrabold text-center drop-shadow">
-          📊 Your Posted Projects
-        </h2>
-        <p className="text-center mt-2 text-indigo-100">
-          Manage, track, and update your projects with ease
-        </p>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+          <div className="flex items-center gap-3 text-indigo-600">
+            <FaLayerGroup size={24} />
+            <h3 className="text-lg font-semibold">Total Projects</h3>
+          </div>
+          <p className="mt-2 text-3xl font-bold">{totalCount}</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+          <div className="flex items-center gap-3 text-green-600">
+            <FaFolderOpen size={24} />
+            <h3 className="text-lg font-semibold">Open Projects</h3>
+          </div>
+          <p className="mt-2 text-3xl font-bold">{openCount}</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+          <div className="flex items-center gap-3 text-yellow-600">
+            <FaTasks size={24} />
+            <h3 className="text-lg font-semibold">In Progress</h3>
+          </div>
+          <p className="mt-2 text-3xl font-bold">{inProgressCount}</p>
+        </div>
+        <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
+          <div className="flex items-center gap-3 text-red-600">
+            <FaCheckCircle size={24} />
+            <h3 className="text-lg font-semibold">Closed</h3>
+          </div>
+          <p className="mt-2 text-3xl font-bold">{closedCount}</p>
+        </div>
       </div>
 
       {/* Search & Filter */}

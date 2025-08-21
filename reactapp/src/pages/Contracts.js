@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaTrash, FaFileContract, FaSort } from "react-icons/fa";
+import {
+  FaTrash,
+  FaFileContract,
+  FaSort,
+  FaCheckCircle,
+  FaHourglassHalf,
+} from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function Contracts() {
@@ -8,7 +14,7 @@ export default function Contracts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sortOption, setSortOption] = useState("COMPLETED_FIRST");
-  const [filterOption, setFilterOption] = useState("ALL"); // new filter
+  const [filterOption, setFilterOption] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedContract, setSelectedContract] = useState(null);
@@ -82,22 +88,28 @@ export default function Contracts() {
     currentPage * pageSize
   );
 
+  // Summary Data
+  const totalContracts = contracts.length;
+  const completedContracts = contracts.filter(
+    (c) => c.status === "COMPLETED"
+  ).length;
+  const pendingContracts = contracts.filter(
+    (c) => c.status === "PENDING"
+  ).length;
+
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <p className="text-gray-500 text-lg animate-pulse">Loading contracts...</p>
+        <p className="text-blue-500 text-lg animate-pulse">
+          Loading contracts...
+        </p>
       </div>
     );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6">
       <Toaster position="top-right" />
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-6 flex items-center justify-center gap-2">
-          <FaFileContract className="text-blue-500" /> Contracts
-        </h2>
-
+      <div className="max-w-5xl mx-auto">
         {/* Error Display */}
         {error && (
           <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6 text-center font-medium">
@@ -105,9 +117,30 @@ export default function Contracts() {
           </div>
         )}
 
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <SummaryCard
+            label="Total Contracts"
+            value={totalContracts}
+            color="from-blue-500 to-indigo-500"
+            icon={<FaFileContract size={28} />}
+          />
+          <SummaryCard
+            label="Pending"
+            value={pendingContracts}
+            color="from-yellow-400 to-orange-400"
+            icon={<FaHourglassHalf size={28} />}
+          />
+          <SummaryCard
+            label="Completed"
+            value={completedContracts}
+            color="from-green-400 to-emerald-500"
+            icon={<FaCheckCircle size={28} />}
+          />
+        </div>
+
         {/* Filter & Sorting */}
         <div className="flex justify-center items-center mb-6 gap-4 flex-wrap">
-
           <div className="flex items-center gap-2">
             <label htmlFor="filter" className="text-gray-700 font-medium">
               Filter:
@@ -117,7 +150,7 @@ export default function Contracts() {
               value={filterOption}
               onChange={(e) => {
                 setFilterOption(e.target.value);
-                setCurrentPage(1); // reset page on filter change
+                setCurrentPage(1);
               }}
               className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
@@ -142,19 +175,30 @@ export default function Contracts() {
               >
                 <div className="space-y-1">
                   <p className="text-gray-800 font-semibold">
-                    Contract ID: <span className="font-normal text-gray-600">{contract.id}</span>
+                    Contract ID:{" "}
+                    <span className="font-normal text-gray-600">
+                      {contract.id}
+                    </span>
                   </p>
                   <p className="text-gray-800 font-semibold">
-                    Project ID: <span className="font-normal text-gray-600">{contract.proposalId}</span>
+                    Project ID:{" "}
+                    <span className="font-normal text-gray-600">
+                      {contract.proposalId}
+                    </span>
                   </p>
                   <p className="text-gray-800 font-semibold">
-                    Description: <span className="font-normal text-gray-600">{contract.description}</span>
+                    Description:{" "}
+                    <span className="font-normal text-gray-600">
+                      {contract.description}
+                    </span>
                   </p>
                   <p className="text-gray-800 font-semibold">
                     Status:{" "}
                     <span
                       className={`font-medium ${
-                        contract.status === "COMPLETED" ? "text-green-600" : "text-yellow-500"
+                        contract.status === "COMPLETED"
+                          ? "text-green-600"
+                          : "text-yellow-500"
                       }`}
                     >
                       {contract.status}
@@ -189,7 +233,9 @@ export default function Contracts() {
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
               className="px-4 py-2 rounded-lg border border-blue-500 text-blue-500 disabled:opacity-50"
             >
@@ -228,6 +274,19 @@ export default function Contracts() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// Reusable Summary Card
+function SummaryCard({ label, value, color, icon }) {
+  return (
+    <div
+      className={`bg-gradient-to-r ${color} text-white p-6 rounded-2xl shadow-md flex flex-col justify-center items-center`}
+    >
+      <div className="mb-2">{icon}</div>
+      <p className="text-sm font-medium">{label}</p>
+      <h3 className="text-2xl font-bold">{value}</h3>
     </div>
   );
 }

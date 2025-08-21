@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -21,7 +26,9 @@ import ViewContracts from "./pages/ViewContracts"; // NEW ADMIN PAGE
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
-  const [role, setRole] = useState((localStorage.getItem("role") || "").toUpperCase());
+  const [role, setRole] = useState(
+    (localStorage.getItem("role") || "").toUpperCase()
+  );
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -78,25 +85,39 @@ function App() {
           />
           <Route
             path="/register"
-            element={token ? <Navigate to={getDashboardRoute()} /> : <Register />}
+            element={
+              token ? <Navigate to={getDashboardRoute()} /> : <Register />
+            }
           />
 
           <Route
             path="/dashboard"
             element={
-              token && hasAccess(["CLIENT", "ADMIN"]) ? <Dashboard /> : <Navigate to="/login" />
+              token && hasAccess(["CLIENT"]) ? (
+                <Dashboard />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
             path="/post-project"
             element={
-              token && hasAccess(["CLIENT", "ADMIN"]) ? <PostProject /> : <Navigate to="/login" />
+              token && hasAccess(["CLIENT", "ADMIN"]) ? (
+                <PostProject />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
             path="/browse-projects"
             element={
-              token && hasAccess(["FREELANCER"]) ? <BrowseProjects /> : <Navigate to="/login" />
+              token && hasAccess(["FREELANCER"]) ? (
+                <BrowseProjects />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
@@ -112,19 +133,31 @@ function App() {
           <Route
             path="/manage-users"
             element={
-              token && hasAccess(["ADMIN"]) ? <ManageUsers /> : <Navigate to="/login" />
+              token && hasAccess(["ADMIN"]) ? (
+                <ManageUsers />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
             path="/view-contracts"
             element={
-              token && hasAccess(["ADMIN"]) ? <ViewContracts /> : <Navigate to="/login" />
+              token && hasAccess(["ADMIN"]) ? (
+                <ViewContracts />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
             path="/proposals/:projectId"
             element={
-              token && hasAccess(["CLIENT", "ADMIN"]) ? <Proposals /> : <Navigate to="/login" />
+              token && hasAccess(["CLIENT", "ADMIN"]) ? (
+                <Proposals />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
@@ -167,7 +200,10 @@ function App() {
               )
             }
           />
-          <Route path="/profile" element={token ? <Profile /> : <Navigate to="/login" />} />
+          <Route
+            path="/profile"
+            element={token ? <Profile /> : <Navigate to="/login" />}
+          />
           <Route path="/profile/:id" element={<VisitProfile />} />
         </Routes>
       </div>
