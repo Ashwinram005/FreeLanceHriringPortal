@@ -20,6 +20,8 @@ export default function Milestones() {
   }, [projectId, token]);
 
   const fetchMilestones = () => {
+        console.log();
+
     axios
       .get(`http://localhost:8080/milestones/project/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -80,6 +82,7 @@ export default function Milestones() {
   };
 
   const handleAddMilestone = (e) => {
+    console.log("ContractId,contractId");
     e.preventDefault();
     if (!contractId) {
       toast.error("No contract found for this project. Cannot add milestone.");

@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaArrowRight, FaSearch } from "react-icons/fa";
 
 export default function FreelancerDashboard() {
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [sortOption, setSortOption] = useState("ACCEPTED_FIRST"); // dropdown selection
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 2;
-  const navigate = useNavigate();
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [searchTerm, setSearchTerm] = useState("");
+  const pageSize = 4; // 4 items per page
 
   const token = localStorage.getItem("token");
   const freelancerId = localStorage.getItem("userId");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!token) {
@@ -49,217 +51,163 @@ export default function FreelancerDashboard() {
     };
 
     fetchProposals();
-  }, [token, freelancerId]);
+  }, [token, freelancerId, navigate]);
 
-  // Sorting by status based on dropdown
-  const sortedProposals = [...proposals].sort((a, b) => {
-    let order;
-    switch (sortOption) {
-      case "ACCEPTED_FIRST":
-        order = { ACCEPTED: 0, REJECTED: 1, PENDING: 2 };
-        break;
-      case "PENDING_FIRST":
-        order = { PENDING: 0, REJECTED: 1, ACCEPTED: 2 };
-        break;
-      case "REJECTED_FIRST":
-        order = { REJECTED: 0, PENDING: 1, ACCEPTED: 2 };
-        break;
-      default:
-        order = { ACCEPTED: 0, REJECTED: 1, PENDING: 2 };
-    }
-    return order[a.status] - order[b.status];
-  });
+  // Filter & search
+  const filteredProposals = proposals
+    .filter((p) => filterStatus === "ALL" || p.status === filterStatus)
+    .filter((p) => p.project.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
   // Pagination
-  const totalPages = Math.ceil(sortedProposals.length / pageSize);
-  const displayedProposals = sortedProposals.slice(
+  const totalPages = Math.ceil(filteredProposals.length / pageSize);
+  const displayedProposals = filteredProposals.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  if (loading) return <p>Loading proposals...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <p className="text-gray-500 text-lg animate-pulse">Loading proposals...</p>
+      </div>
+    );
+
+  if (error)
+    return <p className="text-center text-red-600 font-semibold mt-10">{error}</p>;
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>My Projects</h2>
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-bold text-gray-900 text-center mb-8 flex justify-center items-center gap-3">
+          My Projects
+        </h2>
 
-      {/* Sorting dropdown + Pagination in one row */}
-      {totalPages > 1 ? (
-        <div
-          style={{
-            marginBottom: "20px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          {/* Sorting dropdown */}
-          <div>
-            <label htmlFor="sort" style={{ marginRight: "10px" }}>
-              Sort by Status:
-            </label>
-            <select
-              id="sort"
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-              style={{ padding: "6px 10px", borderRadius: "4px" }}
-            >
-              <option value="ACCEPTED_FIRST">Accepted First</option>
-              <option value="PENDING_FIRST">Pending First</option>
-              <option value="REJECTED_FIRST">Rejected First</option>
-            </select>
+        {/* Filters and Search */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+          <div className="flex items-center gap-2 w-full md:w-1/2">
+            <FaSearch className="text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search projects..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
           </div>
 
-          {/* Pagination controls (top right) */}
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <span>
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      ) : (
-        // Only sorting if no pagination needed
-        <div style={{ marginBottom: "20px" }}>
-          <label htmlFor="sort" style={{ marginRight: "10px" }}>
-            Sort by Status:
-          </label>
           <select
-            id="sort"
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            style={{ padding: "6px 10px", borderRadius: "4px" }}
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <option value="ACCEPTED_FIRST">Accepted First</option>
-            <option value="PENDING_FIRST">Pending First</option>
-            <option value="REJECTED_FIRST">Rejected First</option>
+            <option value="ALL">All Status</option>
+            <option value="ACCEPTED">Accepted</option>
+            <option value="PENDING">Pending</option>
+            <option value="REJECTED">Rejected</option>
           </select>
         </div>
-      )}
 
-      {displayedProposals.length === 0 ? (
-        <p>No proposals submitted yet.</p>
-      ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {displayedProposals.map((proposal) => (
-            <li
-              key={proposal.id}
-              style={{
-                marginBottom: "15px",
-                border: "1px solid #ccc",
-                padding: "10px",
-                borderRadius: "5px",
-              }}
-            >
-              <h3>{proposal.project.title}</h3>
-              <p>
-                <strong>Description:</strong> {proposal.project.description}
-              </p>
-              <p>
-                <strong>Budget:</strong> {proposal.project.minBudget} -{" "}
-                {proposal.project.maxBudget}
-              </p>
-              <p>
-                <strong>Deadline:</strong>{" "}
-                {new Date(proposal.project.deadline).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Skills:</strong> {proposal.project.skills.join(", ")}
-              </p>
-              <p>
-                <strong>Bid Amount:</strong> {proposal.bidAmount}
-              </p>
-              <p>
-                <strong>Status:</strong> {proposal.status}
-              </p>
-
-              {proposal.status === "ACCEPTED" && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    marginTop: "10px",
-                  }}
-                >
-                  <button
-                    style={{
-                      padding: "6px 12px",
-                      backgroundColor: "#007bff",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => navigate(`/milestones/${proposal.projectId}`)}
+        {/* Proposals */}
+        {displayedProposals.length === 0 ? (
+          <p className="text-center text-gray-500 font-medium">No projects found.</p>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2">
+            {displayedProposals.map((proposal) => (
+              <div
+                key={proposal.id}
+                className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col justify-between"
+              >
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold text-gray-800">{proposal.project.title}</h3>
+                  <p className="text-gray-600">{proposal.project.description}</p>
+                  <p className="text-gray-700">
+                    <strong>Budget:</strong> {proposal.project.minBudget} - {proposal.project.maxBudget}
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Deadline:</strong> {new Date(proposal.project.deadline).toLocaleDateString()}
+                  </p>
+                  <p className="text-gray-700">
+                    <strong>Skills:</strong> {proposal.project.skills.join(", ")}
+                  </p>
+                  <p
+                    className={`font-semibold ${
+                      proposal.status === "ACCEPTED"
+                        ? "text-green-600"
+                        : proposal.status === "PENDING"
+                        ? "text-yellow-500"
+                        : "text-red-600"
+                    }`}
                   >
-                    View More
-                  </button>
-
-                  <button
-                    style={{
-                      padding: "6px 12px",
-                      backgroundColor: "green",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() =>
-                      navigate(`/contracts/create?proposalId=${proposal.id}`)
-                    }
-                  >
-                    Create Contract
-                  </button>
+                    {proposal.status}
+                  </p>
+                  <p>
+                    <strong>Bid Amount:</strong> ${proposal.bidAmount}
+                  </p>
                 </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
 
-      {/* Pagination controls (bottom center) */}
-      {totalPages > 1 && (
-        <div
-          style={{
-            marginTop: "20px",
-            display: "flex",
-            justifyContent: "center",
-            gap: "10px",
-          }}
-        >
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      )}
+                {proposal.status === "ACCEPTED" && (
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      onClick={() => navigate(`/milestones/${proposal.projectId}`)}
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-transform transform hover:scale-105"
+                    >
+                      Milestones
+                    </button>
+                    <button
+                      onClick={() =>
+                        navigate(`/contracts/create?proposalId=${proposal.id}`)
+                      }
+                      className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-transform transform hover:scale-105"
+                    >
+                      Create Contract
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-8 flex-wrap">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 rounded-lg border border-blue-500 text-blue-500 disabled:opacity-50"
+            >
+              <FaArrowLeft />
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`px-3 py-1 rounded-lg border ${
+                  page === currentPage
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "text-blue-500 border-blue-500"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 rounded-lg border border-blue-500 text-blue-500 disabled:opacity-50"
+            >
+              <FaArrowRight />
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -112,7 +112,9 @@ export default function FileUpload() {
             className="p-3 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           {file && (
-            <p className="text-gray-700 font-medium">📄 Selected: {file.name}</p>
+            <p className="text-gray-700 font-medium">
+              📄 Selected: {file.name}
+            </p>
           )}
           <button
             type="submit"

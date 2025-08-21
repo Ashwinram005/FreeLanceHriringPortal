@@ -1,4 +1,3 @@
-// src/pages/ViewContracts.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaTrash, FaFileContract, FaSort } from "react-icons/fa";
@@ -9,6 +8,7 @@ export default function Contracts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sortOption, setSortOption] = useState("COMPLETED_FIRST");
+  const [filterOption, setFilterOption] = useState("ALL"); // new filter
   const [currentPage, setCurrentPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedContract, setSelectedContract] = useState(null);
@@ -33,7 +33,6 @@ export default function Contracts() {
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log(response.data);
         setContracts(response.data);
       } catch (err) {
         console.error(err.response || err);
@@ -63,8 +62,12 @@ export default function Contracts() {
     }
   };
 
-  // Sort contracts
-  const sortedContracts = [...contracts].sort((a, b) => {
+  // Filter + Sort
+  const filteredContracts = contracts.filter((c) =>
+    filterOption === "ALL" ? true : c.status === filterOption
+  );
+
+  const sortedContracts = [...filteredContracts].sort((a, b) => {
     const order =
       sortOption === "COMPLETED_FIRST"
         ? { COMPLETED: 0, PENDING: 1 }
@@ -82,9 +85,7 @@ export default function Contracts() {
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <p className="text-gray-500 text-lg animate-pulse">
-          Loading contracts...
-        </p>
+        <p className="text-gray-500 text-lg animate-pulse">Loading contracts...</p>
       </div>
     );
 
@@ -104,28 +105,33 @@ export default function Contracts() {
           </div>
         )}
 
-        {/* Sorting */}
-        <div className="flex justify-center items-center mb-6 gap-2">
-          <FaSort className="text-gray-600" />
-          <label htmlFor="sort" className="text-gray-700 font-medium">
-            Sort by status:
-          </label>
-          <select
-            id="sort"
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            <option value="COMPLETED_FIRST">Completed First</option>
-            <option value="PENDING_FIRST">Pending First</option>
-          </select>
+        {/* Filter & Sorting */}
+        <div className="flex justify-center items-center mb-6 gap-4 flex-wrap">
+
+          <div className="flex items-center gap-2">
+            <label htmlFor="filter" className="text-gray-700 font-medium">
+              Filter:
+            </label>
+            <select
+              id="filter"
+              value={filterOption}
+              onChange={(e) => {
+                setFilterOption(e.target.value);
+                setCurrentPage(1); // reset page on filter change
+              }}
+              className="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              <option value="ALL">All</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="PENDING">Pending</option>
+            </select>
+          </div>
         </div>
 
         {/* Contract List */}
-        {/* Contract List */}
         {displayedContracts.length === 0 ? (
           <p className="text-center text-gray-500">
-            No approved projects/contracts yet.
+            No contracts match the selected filter.
           </p>
         ) : (
           <div className="grid gap-6">
@@ -136,30 +142,19 @@ export default function Contracts() {
               >
                 <div className="space-y-1">
                   <p className="text-gray-800 font-semibold">
-                    Contract ID:{" "}
-                    <span className="font-normal text-gray-600">
-                      {contract.id}
-                    </span>
+                    Contract ID: <span className="font-normal text-gray-600">{contract.id}</span>
                   </p>
                   <p className="text-gray-800 font-semibold">
-                    Project ID:{" "}
-                    <span className="font-normal text-gray-600">
-                      {contract.proposalId}
-                    </span>
+                    Project ID: <span className="font-normal text-gray-600">{contract.proposalId}</span>
                   </p>
                   <p className="text-gray-800 font-semibold">
-                    Description:{" "}
-                    <span className="font-normal text-gray-600">
-                      {contract.description}
-                    </span>
+                    Description: <span className="font-normal text-gray-600">{contract.description}</span>
                   </p>
                   <p className="text-gray-800 font-semibold">
                     Status:{" "}
                     <span
                       className={`font-medium ${
-                        contract.status === "COMPLETED"
-                          ? "text-green-600"
-                          : "text-yellow-500"
+                        contract.status === "COMPLETED" ? "text-green-600" : "text-yellow-500"
                       }`}
                     >
                       {contract.status}
@@ -194,9 +189,7 @@ export default function Contracts() {
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
               className="px-4 py-2 rounded-lg border border-blue-500 text-blue-500 disabled:opacity-50"
             >

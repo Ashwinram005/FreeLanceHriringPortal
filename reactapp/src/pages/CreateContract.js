@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaArrowLeft } from "react-icons/fa";
 
 export default function CreateContract() {
   const [description, setDescription] = useState("");
@@ -27,7 +27,7 @@ export default function CreateContract() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Contract created successfully!");
-      setTimeout(() => navigate("/freelancer/dashboard"), 1500);
+      setTimeout(() => navigate("/freelancer-dashboard"), 0);
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Failed to create contract.");
@@ -41,6 +41,14 @@ export default function CreateContract() {
       <Toaster position="top-right" />
 
       <div className="bg-white shadow-2xl rounded-3xl w-full max-w-lg p-10 flex flex-col gap-6">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-blue-600 font-semibold mb-4 hover:text-blue-800 transition-colors"
+        >
+          <FaArrowLeft /> Back
+        </button>
+
         {/* Header */}
         <div className="flex flex-col items-center mb-6">
           <FaCheckCircle className="text-5xl text-green-500 mb-2" />
