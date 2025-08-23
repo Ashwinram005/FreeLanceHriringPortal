@@ -33,8 +33,8 @@ export default function Contracts() {
 
         let url =
           role === "CLIENT"
-            ? `http://localhost:8080/contracts/client/${userId}`
-            : `http://localhost:8080/contracts/freelancer/${userId}`;
+            ? `https://freelancehriringportal.onrender.com/contracts/client/${userId}`
+            : `https://freelancehriringportal.onrender.com/contracts/freelancer/${userId}`;
 
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` },
@@ -54,7 +54,7 @@ export default function Contracts() {
   // Delete contract
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/contracts/${id}`, {
+      await axios.delete(`https://freelancehriringportal.onrender.com/contracts/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setContracts((prev) => prev.filter((c) => c.id !== id));

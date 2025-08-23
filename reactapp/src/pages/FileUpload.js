@@ -23,7 +23,7 @@ export default function FileUpload() {
   const fetchUploadedFiles = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8080/files/project/${projectId}`,
+        `https://freelancehriringportal.onrender.com/files/project/${projectId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setUploadedFiles(res.data || []);
@@ -46,7 +46,7 @@ export default function FileUpload() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/files/upload",
+        "https://freelancehriringportal.onrender.com/files/upload",
         formData,
         {
           headers: {
@@ -73,7 +73,7 @@ export default function FileUpload() {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/files/${selectedFile.id}`, {
+      await axios.delete(`https://freelancehriringportal.onrender.com/files/${selectedFile.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("File deleted successfully!");
@@ -142,7 +142,7 @@ export default function FileUpload() {
                   className="flex justify-between items-center p-3 bg-gray-50 rounded-lg shadow-sm"
                 >
                   <a
-                    href={`http://localhost:8080/files/download/${f.id}`}
+                    href={`https://freelancehriringportal.onrender.com/files/download/${f.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 font-medium hover:underline"

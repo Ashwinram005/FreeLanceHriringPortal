@@ -23,7 +23,7 @@ export default function Milestones() {
         console.log();
 
     axios
-      .get(`http://localhost:8080/milestones/project/${projectId}`, {
+      .get(`https://freelancehriringportal.onrender.com/milestones/project/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setMilestones(res.data))
@@ -32,7 +32,7 @@ export default function Milestones() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/contracts/project/${projectId}`, {
+      .get(`https://freelancehriringportal.onrender.com/contracts/project/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -49,7 +49,7 @@ export default function Milestones() {
     if (!contractId) return;
     axios
       .put(
-        `http://localhost:8080/contracts/${contractId}`,
+        `https://freelancehriringportal.onrender.com/contracts/${contractId}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -63,7 +63,7 @@ export default function Milestones() {
   const handleMilestoneStatusChange = (milestoneId, newStatus) => {
     axios
       .put(
-        `http://localhost:8080/milestones/${milestoneId}`,
+        `https://freelancehriringportal.onrender.com/milestones/${milestoneId}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -90,7 +90,7 @@ export default function Milestones() {
     }
     axios
       .post(
-        "http://localhost:8080/milestones",
+        "https://freelancehriringportal.onrender.com/milestones",
         { contractId, description, status },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -110,7 +110,7 @@ export default function Milestones() {
   const handleDeleteMilestone = (id) => {
     if (!window.confirm("Are you sure you want to delete this milestone?")) return;
     axios
-      .delete(`http://localhost:8080/milestones/${id}`, {
+      .delete(`https://freelancehriringportal.onrender.com/milestones/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
@@ -125,7 +125,7 @@ export default function Milestones() {
 
   const handleDeleteFile = (milestoneId) => {
     axios
-      .delete(`http://localhost:8080/milestones/${milestoneId}/file`, {
+      .delete(`https://freelancehriringportal.onrender.com/milestones/${milestoneId}/file`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {

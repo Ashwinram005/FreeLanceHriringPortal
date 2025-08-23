@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // Central backend URL (update here if it changes)
-export const API_BASE_URL = "http://localhost:8080/api";
+export const API_BASE_URL = "https://freelancehriringportal.onrender.com/api";
 
 
 // ----- Project APIs -----

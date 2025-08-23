@@ -18,7 +18,7 @@ export default function Proposals() {
     const fetchProposals = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/proposal/client/${localStorage.getItem("userId")}`,
+          `https://freelancehriringportal.onrender.com/proposal/client/${localStorage.getItem("userId")}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const filtered = response.data.filter(
@@ -49,20 +49,20 @@ export default function Proposals() {
   const updateProposalStatus = async (proposalId, status) => {
     try {
       await axios.put(
-        `http://localhost:8080/proposal/${proposalId}`,
+        `https://freelancehriringportal.onrender.com/proposal/${proposalId}`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (status === "ACCEPTED") {
         await axios.put(
-          `http://localhost:8080/projects/${projectId}/status`,
+          `https://freelancehriringportal.onrender.com/projects/${projectId}/status`,
           { status: "IN_PROGRESS" },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         await axios.post(
-          `http://localhost:8080/contracts`,
+          `https://freelancehriringportal.onrender.com/contracts`,
           {
             proposalId,
             description: "Contract for accepted proposal",

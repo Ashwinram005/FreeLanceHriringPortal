@@ -33,7 +33,7 @@ export default function Dashboard() {
     const fetchProjects = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/projects/client/${clientId}`,
+          `https://freelancehriringportal.onrender.com/projects/client/${clientId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setProjects(response.data);
@@ -54,7 +54,7 @@ export default function Dashboard() {
   const handleStatusChange = async (projectId, newStatus) => {
     try {
       await axios.put(
-        `http://localhost:8080/projects/${projectId}/status`,
+        `https://freelancehriringportal.onrender.com/projects/${projectId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

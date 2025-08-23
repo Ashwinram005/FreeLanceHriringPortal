@@ -11,7 +11,7 @@ export default function Profile() {
     const fetchUser = async () => {
       try {
         const resUsers = await axios.get(
-          "http://localhost:8080/api/auth/users"
+          "https://freelancehriringportal.onrender.com/api/auth/users"
         );
         const currentUser = resUsers.data.find((u) => u.id === userId);
         setUser(currentUser);

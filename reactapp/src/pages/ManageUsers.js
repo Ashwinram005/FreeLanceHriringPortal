@@ -35,7 +35,7 @@ export default function ManageUsers() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:8080/api/auth/users");
+      const res = await axios.get("https://freelancehriringportal.onrender.com/api/auth/users");
       const allUsers = res.data;
       setClients(allUsers.filter((u) => u.role.toUpperCase() === "CLIENT"));
       setFreelancers(
@@ -58,7 +58,7 @@ export default function ManageUsers() {
   const handleDeleteUser = async () => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/auth/users/${deleteUserId}`
+        `https://freelancehriringportal.onrender.com/api/auth/users/${deleteUserId}`
       );
       toast.success("User deleted successfully!");
       fetchUsers();

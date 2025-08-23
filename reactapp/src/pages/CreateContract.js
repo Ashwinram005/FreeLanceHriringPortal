@@ -22,7 +22,7 @@ export default function CreateContract() {
     setSubmitting(true);
     try {
       await axios.post(
-        "http://localhost:8080/contracts",
+        "https://freelancehriringportal.onrender.com/contracts",
         { proposalId, description, status },
         { headers: { Authorization: `Bearer ${token}` } }
       );

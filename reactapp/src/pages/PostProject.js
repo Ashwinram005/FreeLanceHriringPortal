@@ -79,7 +79,7 @@ export default function PostProject() {
     };
 
     try {
-      await axios.post("http://localhost:8080/projects", projectData, {
+      await axios.post("https://freelancehriringportal.onrender.com/projects", projectData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Your idea has been posted successfully!");

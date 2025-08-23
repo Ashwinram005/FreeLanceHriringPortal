@@ -35,14 +35,14 @@ export default function FreelancerDashboard() {
     const fetchProposals = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/proposal/freelancer/${freelancerId}`,
+          `https://freelancehriringportal.onrender.com/proposal/freelancer/${freelancerId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         const enriched = await Promise.all(
           response.data.map(async (proposal) => {
             const projectRes = await axios.get(
-              `http://localhost:8080/projects/${proposal.projectId}`,
+              `https://freelancehriringportal.onrender.com/projects/${proposal.projectId}`,
               { headers: { Authorization: `Bearer ${token}` } }
             );
             return { ...proposal, project: projectRes.data };

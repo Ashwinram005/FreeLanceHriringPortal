@@ -23,7 +23,7 @@ export default function ViewContracts() {
   useEffect(() => {
     const fetchContracts = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/contracts", {
+        const response = await axios.get("https://freelancehriringportal.onrender.com/contracts", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setContracts(response.data);

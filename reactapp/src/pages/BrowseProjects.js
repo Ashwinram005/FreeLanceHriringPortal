@@ -31,7 +31,7 @@ export default function BrowseProjects() {
 
     const fetchProjects = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/projects", {
+        const response = await axios.get("https://freelancehriringportal.onrender.com/projects", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProjects(response.data);
@@ -60,7 +60,7 @@ export default function BrowseProjects() {
 
     try {
       await axios.post(
-        "http://localhost:8080/proposal",
+        "https://freelancehriringportal.onrender.com/proposal",
         {
           projectId: selectedProject.id,
           freelancerId: Number(freelancerId),

@@ -15,7 +15,7 @@ export default function VisitProfile() {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/auth/users/${id}`);
+      const res = await axios.get(`https://freelancehriringportal.onrender.com/api/auth/users/${id}`);
       setUser(res.data);
     } catch (err) {
       console.error("Failed to fetch user:", err);
