@@ -3,6 +3,8 @@ package com.examly.springapp.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +14,10 @@ import com.examly.springapp.model.Proposal;
 public interface ProposalRepository extends JpaRepository<Proposal, Long> {
    Optional<Proposal> findByProjectIdAndFreelancerId(Long projectId, Long freelancerId);
 
+   Page<Proposal> findByProject_Client_Id(Long clientId, Pageable pageable);
+
    List<Proposal> findByProject_Client_Id(Long clientId);
+
    List<Proposal> findByFreelancerId(Long freelancerId);
-   
+
 }

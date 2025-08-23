@@ -23,7 +23,8 @@ public class ProposalService {
 
     @Autowired
     private ProposalRepository proposalRepository;
-
+    @Autowired
+    private ProjectService projectService;
     @Autowired
     private ProjectRepository projectRepository;
 
@@ -36,27 +37,27 @@ public class ProposalService {
     public ProposalDTO createProposal(ProposalDTO proposalDTO) {
 
         boolean exists = proposalRepository
-        .findByProjectIdAndFreelancerId(proposalDTO.getProjectId(), proposalDTO.getFreelancerId())
-        .isPresent();
+                .findByProjectIdAndFreelancerId(proposalDTO.getProjectId(), proposalDTO.getFreelancerId())
+                .isPresent();
         if (exists) {
             throw new IllegalArgumentException("You have already submitted a proposal for this project.");
         }
-        Proposal proposal = convertToEntity(proposalDTO);   
+        Proposal proposal = convertToEntity(proposalDTO);
         Proposal saved = proposalRepository.save(proposal);
         return convertToDTO(saved);
     }
 
-    public List<ProposalDTO> getAllProposal(){
+    public List<ProposalDTO> getAllProposal() {
         List<Proposal> proposal = proposalRepository.findAll();
         return proposal.stream()
-        .map(this::convertToDTO)
-        .collect(Collectors.toList());
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public ProposalDTO getProposalById(Long id) {
-        Proposal proposal=proposalRepository.findById(id)
-            .orElseThrow(()-> new IllegalArgumentException("proposal not found"));
-        
+        Proposal proposal = proposalRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("proposal not found"));
+
         return convertToDTO(proposal);
     }
 
@@ -73,7 +74,6 @@ public class ProposalService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-
 
     public ProposalDTO updateProposal(Long id, ProposalDTO dto) {
         Proposal proposal = proposalRepository.findById(id)
@@ -94,7 +94,6 @@ public class ProposalService {
         return convertToDTO(saved);
     }
 
-
     public ProposalDTO acceptProposal(Long proposalId, String contractDescription) {
         Proposal proposal = proposalRepository.findById(proposalId)
                 .orElseThrow(() -> new IllegalArgumentException("Proposal not found"));
@@ -110,14 +109,16 @@ public class ProposalService {
         contractService.createContract(contractDTO);
 
         return convertToDTO(proposal);
-    }   
-public List<ProposalDTO> getProposalsByClientId(Long clientId, int page, int size) {
-    PageRequest pageable = PageRequest.of(page, size);
-    return proposalRepository.findByProject_Client_Id(clientId, pageable)
-            .stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
     }
+
+    public List<ProposalDTO> getProposalsByClientId(Long clientId, int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        return proposalRepository.findByProject_Client_Id(clientId, pageable)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     private Proposal convertToEntity(ProposalDTO dto) {
         Proposal proposal = new Proposal();
         Project project = projectRepository.findById(dto.getProjectId())
@@ -157,4 +158,3 @@ public List<ProposalDTO> getProposalsByClientId(Long clientId, int page, int siz
     }
 
 }
-

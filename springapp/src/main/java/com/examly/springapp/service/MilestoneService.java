@@ -84,7 +84,9 @@ public class MilestoneService {
                 milestone.getId(),
                 milestone.getContract().getId(),
                 milestone.getDescription(),
-                milestone.getStatus().name()
-        );
+                milestone.getStatus().name(),
+                milestone.getFileName(),
+                milestone.getFilePath()       
+                );
     }
 }

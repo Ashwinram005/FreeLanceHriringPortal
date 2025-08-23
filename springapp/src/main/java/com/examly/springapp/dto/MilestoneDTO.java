@@ -10,4 +10,6 @@ public class MilestoneDTO {
     private Long contractId;
     private String description;
     private String status; 
+    private String fileName;  // NEW
+    private String filePath;  
 }

@@ -23,7 +23,8 @@ public class Milestone {
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
-
+private String fileName;   // NEW
+    private String filePath;
     public enum Status {
         PENDING, COMPLETED
     }
